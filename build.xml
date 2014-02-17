@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="PircBotx" default="compile">
+    <description>
+            Build file for PircBotx project.
+    </description>
+
+	<property name="src" location="src"/>
+	<property name="classesoutput" location="classes"/>
+	<property name="lib" location="lib"/>
+	
+	
+	
+	<target name="clean" description="Clean output dir">
+	    <echo message="Delete ${classesoutput}"></echo>
+	
+	    <delete includeEmptyDirs="true" quiet="true">
+	        <fileset dir="${classesoutput}"/>
+	    </delete>
+	
+	    <mkdir dir="${classesoutput}"/>
+	</target>
+	
+    <target name="compile" description="Compile source" depends="clean">
+    	<javac srcdir="${src}"
+    	         destdir="${classesoutput}"
+    	         source="1.7">
+    		<classpath>
+    			<fileset dir="${lib}">
+				    <include name="*.jar"/>
+				</fileset>
+    		</classpath>
+    	</javac>
+    </target>
+
+</project>
