@@ -1,4 +1,4 @@
 raspipircx
 ==========
 
-Bot based on PitcBotX running on a RaspberryPi
+Bot based on PitcBotX running on a RaspberryPi. Educational project.
