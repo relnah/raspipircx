@@ -1,4 +1,6 @@
 package se.relnah.raspipircx;
+import javax.net.ssl.SSLSocketFactory;
+
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 
@@ -12,9 +14,11 @@ public class RaspiPircx {
         	        .setName("Relnah_Servant") //Set the nick of the bot. CHANGE IN YOUR CODE
         	        .setLogin("RelnahServant") //login part of hostmask, eg name:login@host
         	        .setAutoNickChange(true) //Automatically change nick when the current one is in use
-        	        //.setCapEnabled(true) //Enable CAP features
+        	        .setCapEnabled(true) //Enable CAP features
         	        .addListener(new HelloListener()) //This class is a listener, so add it to the bots known listeners
-        	        .setServerHostname("se.quakenet.org")
+        	        .setServerHostname("leguin.freenode.net")
+        	        .setServerPort(6697)
+        	        .setSocketFactory(SSLSocketFactory.getDefault())
         	        .addAutoJoinChannel("#ist-ku-se") //Join the official #pircbotx channel
         	        .buildConfiguration();
         	PircBotX bot = new PircBotX(configuration);
