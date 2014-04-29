@@ -1,6 +1,7 @@
 package se.relnah.raspipircx.listener;
 
 import java.util.List;
+import java.util.Random;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -28,6 +29,11 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     public void onJoin(JoinEvent<PircBotX> event) throws Exception {
         
         String nick = event.getUser().getNick();
+        
+        if (nick.equals(event.getBot().getNick())) {
+            return;
+        }
+        
         Boolean foundUser = false;
         BotUser currentUser = null;
 
@@ -87,6 +93,34 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     @Override
     public void onMessage(MessageEvent<PircBotX> event) throws Exception{
         
+        if (event.getUser().getNick().equals(event.getBot().getNick())) {
+            return;
+        }
+        
+        if (event.getUser().getNick().equals("David_B")) {
+            
+            //admin actions
+        }
+        
+        //public actions
+        
+        if (event.getMessage().startsWith(".kudos")) { // Rewards XP. Usage: .kudos <nick>
+            String[] param = event.getMessage().split(" ");
+            
+            BotUser usr = UtilityService.getUser(param[1], userList);
+            
+            if (usr != null) {
+                int xp = 50;
+                
+                //Add random xp, 0-10
+                Random r = new Random();
+                xp += r.nextInt(11);
+                
+                event.respond(usr.getNick() + " fick " + xp + " XP av " + event.getUser().getNick() + " som tack för hjälpen!");
+                Thread.sleep(10);
+                addXpToUser(usr, xp, event);
+            }
+        }
         
         
     }
