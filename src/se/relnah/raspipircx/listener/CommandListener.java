@@ -11,6 +11,7 @@ import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 import se.relnah.raspipircx.pojo.BotUser;
 import se.relnah.raspipircx.service.SerializeService;
+import se.relnah.raspipircx.service.UtilityService;
 
 /**
  * @author davbj
@@ -41,21 +42,6 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                 event.respond("Saved!");
             }
             
-            //Add xp to user. Usage: .addXp <user> <xp>
-            if(event.getMessage().startsWith(".addXp")) {
-                String[] param = event.getMessage().split(" ");
-                
-                event.respond("Add " + param[2] + " to " + param[1]);
-
-                for (BotUser usr : userList) {
-                    if (usr.getNick().equals(param[1])) {
-                        usr.addXp(Integer.parseInt(param[2]));
-                        break;
-                    }
-                }
-                
-                
-            }
         }
         
         //public commands
@@ -63,13 +49,9 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
         //Send user info
         if(event.getMessage().equals(".myInfo")) {
             String response = "Sorry, could not find you in the records...";
-                    
-            for (BotUser usr : userList) {
-                if (usr.getNick().equals(event.getUser().getNick())) {
-                    response = "Nick: " + usr.getNick() + " XP: " + usr.getXp() + " Level: " + usr.getLevel();
-                    break;
-                }
-            }
+            
+            BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);
+            response = "Nick: " + usr.getNick() + " XP: " + usr.getXp() + " Level: " + usr.getLevel();
             
             event.respond(response);
         }

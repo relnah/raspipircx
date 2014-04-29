@@ -5,13 +5,16 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.DisconnectEvent;
 import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 import se.relnah.raspipircx.pojo.BotUser;
 import se.relnah.raspipircx.service.SerializeService;
+import se.relnah.raspipircx.service.UtilityService;
 
 public class XpListener extends ListenerAdapter<PircBotX> {
     
@@ -25,25 +28,24 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     public void onJoin(JoinEvent<PircBotX> event) throws Exception {
         
         String nick = event.getUser().getNick();
-        Boolean foundNick = false;
+        Boolean foundUser = false;
         BotUser currentUser = null;
-        
+
         //Check if new user
-        for (BotUser user : userList) {
-            if(nick.equalsIgnoreCase(user.getNick())) {
-                foundNick = true;
-                currentUser = user;
-                break;
-            }
+        
+        currentUser = UtilityService.getUser(event.getUser().getNick(), userList);
+        
+        if (currentUser != null) {
+            foundUser = true;
         }
         
         //New user
-        if (!foundNick) {
-            BotUser usr = new BotUser(nick);
-            usr.setHostMask(event.getUser().getHostmask());
-            addXpToUser(usr, 5, event);
-            usr.setLastJoinedTimestamp(event.getTimestamp());
-            userList.add(usr);
+        if (!foundUser) {
+            BotUser newUsr = new BotUser(nick);
+            newUsr.setHostMask(event.getUser().getHostmask());
+            addXpToUser(newUsr, 150, event);
+            newUsr.setLastJoinedTimestamp(event.getTimestamp());
+            userList.add(newUsr);
             
         } else { //Existing user
          
@@ -55,14 +57,85 @@ public class XpListener extends ListenerAdapter<PircBotX> {
 
             //Add xp for first join of the day
             if (nowDate.compareTo(lastLoginDate) > 0) {
-                addXpToUser(currentUser, 1, event);
+                
+                int xp = 100;
+                
+                // if last login was yesterday, increase consecDays and multiply xp by days.
+                if ( nowDate.minusDays(1).isEqual(lastLoginDate)) {
+                    int consecDays = currentUser.increaseConsecutiveDays();
+                    xp = xp * consecDays;
+                } else { //Reset counter if there is a gap
+                    currentUser.setConsecutiveDays(1);
+                }
+                
+                addXpToUser(currentUser, xp, event);
+                
                 currentUser.setLastJoinedTimestamp(event.getTimestamp());
             }
             
         }
         
+
+        //Greet joining users.
+        String greeting = getGreeting(currentUser, event.getTimestamp());
+        
+        event.respond(greeting);
+        
     }
     
+
+    @Override
+    public void onMessage(MessageEvent<PircBotX> event) throws Exception{
+        
+        
+        
+    }
+    
+    @Override
+    public void onPrivateMessage(PrivateMessageEvent<PircBotX> event)
+            throws Exception {
+        //Check if admin
+        if (event.getUser().getNick().equals("David_B")) {
+            
+            //admin commands
+            
+            //Add xp to user. Usage: .addXp <user> <xp>
+            if(event.getMessage().startsWith(".addXp")) {
+                String[] param = event.getMessage().split(" ");
+                
+                event.respond("Add " + param[2] + " to " + param[1]);
+
+                BotUser usr = UtilityService.getUser(param[1], userList);
+                addXpToUser(usr, Integer.parseInt(param[2]), event);
+                
+            }
+        }
+    }
+
+    /**
+     * Gets greeting phrase based on hour of day and user title.
+     * @param currentUser
+     * @param timestamp
+     * @return
+     */
+    private String getGreeting(BotUser currentUser, long timestamp) {
+
+        String greeting = "";
+        DateTime now = new DateTime(timestamp);
+        int hour = now.getHourOfDay();
+        
+        if (hour >= 6 && hour <= 9) {
+            greeting += "God morgon ";
+        } else {
+            greeting += "Hej ";
+        }
+        
+        greeting += "!";
+        
+        return greeting;
+    
+    }
+
     /**
      * Adds xp to user and calculates level. Responds with a message if calculated level is greater than current level and sets it as new level.
      * 
@@ -70,14 +143,14 @@ public class XpListener extends ListenerAdapter<PircBotX> {
      * @param xp
      * @param event
      */
-    private void addXpToUser(BotUser usr, int xp, JoinEvent<PircBotX> event) {
+    private void addXpToUser(BotUser usr, int xp, Event<PircBotX> event) {
         int newXp = usr.addXp(xp);
         
         int calculatedLevel = calculateLevel(newXp, usr.getLevel());
         
         if (calculatedLevel > usr.getLevel()) {
             usr.setLevel(calculatedLevel);
-            event.respond("Ding! " + event.getUser().getNick() + " leveled up and is now level " + usr.getLevel() + ". Congratulations!");
+            event.respond("Ding! " + usr.getNick() + " leveled up and is now level " + usr.getLevel() + ". Congratulations!");
         }
         
     }
@@ -90,21 +163,16 @@ public class XpListener extends ListenerAdapter<PircBotX> {
      */
     private int calculateLevel(int newXp, int lvl) {
 
-        int nextLvlReq = (5 * lvl) * ((lvl * 3) + 10);
+        int nextLvlReq = (4 * lvl) * ((3 * lvl) + 45);
         
-        if (newXp > nextLvlReq) {
-            return lvl++;
-        } else {
-            return lvl;
+        while (newXp > nextLvlReq) {
+            lvl++;
+            nextLvlReq = (4 * lvl) * ((3 * lvl) + 45);
         }
+        
+        return lvl;
     }
 
-    @Override
-    public void onMessage(MessageEvent<PircBotX> event) throws Exception{
-        
-        
-    }
-    
     @Override
     public void onDisconnect(DisconnectEvent<PircBotX> event) throws Exception {
         SerializeService.saveUserList(userList);

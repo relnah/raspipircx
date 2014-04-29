@@ -1,4 +1,5 @@
 package se.relnah.raspipircx;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -6,6 +7,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
+import org.pircbotx.exception.IrcException;
 
 import se.relnah.raspipircx.listener.CommandListener;
 import se.relnah.raspipircx.listener.XpListener;
@@ -15,7 +17,7 @@ import se.relnah.raspipircx.service.SerializeService;
 public class RaspiPircx {
 
     private static List<BotUser> userList = new ArrayList<BotUser>();
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         userList = SerializeService.loadUserList();
         	//Setup this bot
@@ -36,11 +38,13 @@ public class RaspiPircx {
         	//Connect to server
         	try {
         	        bot.startBot();
-        	} catch (Exception ex) {
-        	         ex.printStackTrace();
-        	}        	
-        	
-        	
+        	} catch (IOException e) {
+                SerializeService.saveUserList(userList);
+                e.printStackTrace();
+            } catch (IrcException e) {
+                SerializeService.saveUserList(userList);
+                e.printStackTrace();
+            }       	
         	
         }
 }

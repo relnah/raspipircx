@@ -21,13 +21,14 @@ import se.relnah.raspipircx.pojo.BotUser;
  */
 public final class SerializeService {
 
-    //protected SerializeService(){};
+    protected SerializeService(){};
     
     
 
     public static void saveUserList(List<BotUser> userList) {
-        // Let's serialize an Object
+        // Serialize userList
         try {
+            System.out.println("Saving user list...");
             FileOutputStream fileOut = new FileOutputStream("./users.txt");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(userList);
@@ -45,7 +46,7 @@ public final class SerializeService {
     @SuppressWarnings("unchecked")
     public static List<BotUser> loadUserList() {
         List<BotUser> userList = new ArrayList<BotUser>();
-        // Let's deserialize an Object
+        // Deserialize userList
         try {
             FileInputStream fileIn = new FileInputStream("./users.txt");
             ObjectInputStream in = new ObjectInputStream(fileIn);
@@ -57,7 +58,6 @@ public final class SerializeService {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         
