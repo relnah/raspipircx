@@ -1,0 +1,16 @@
+
+#Configuration file for IRC XP-Bot
+#Nick name of the bot.
+botNick = 
+
+#Bot will join this channel on startup.
+channel = 
+
+#Login part of login@host...
+login = 
+
+#SSL port for server
+port = 
+
+#SSL enabled server
+server = 
