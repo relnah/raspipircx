@@ -61,7 +61,7 @@ public class RaspiPircx {
         Properties prop = new Properties();
         FileInputStream in = null;
         try {
-            in = new FileInputStream("./conf/conf.properties");
+            in = new FileInputStream(configFile);
             prop.load(in);
             in.close();
         } catch (FileNotFoundException e1) {
