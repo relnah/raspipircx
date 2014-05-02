@@ -22,6 +22,42 @@ public class RaspiPircx {
     private static List<BotUser> userList = new ArrayList<BotUser>();
     public static void main(String[] args) {
 
+        Properties conf = readConfig("./conf/conf.properties");
+        
+        userList = SerializeService.loadUserList();
+        	//Setup this bot
+        	Configuration<PircBotX> configuration = new Configuration.Builder<PircBotX>()
+        	        .setName(conf.getProperty("botNick")) //Set the nick of the bot.
+        	        .setLogin(conf.getProperty("login")) //login part of hostmask, eg name:login@host
+        	        .setAutoNickChange(true) //Automatically change nick when the current one is in use
+        	        .setCapEnabled(true) //Enable CAP features
+        	        .addListener(new XpListener(userList)) //This class is a listener, so add it to the bots known listeners
+        	        .addListener(new CommandListener(userList))
+        	        .setServerHostname(conf.getProperty("server"))
+        	        .setServerPort(Integer.parseInt(conf.getProperty("port")))
+        	        .setSocketFactory(SSLSocketFactory.getDefault())
+        	        .addAutoJoinChannel(conf.getProperty("channel"))
+        	        .buildConfiguration();
+        	PircBotX bot = new PircBotX(configuration);
+
+        	//Connect to server
+        	try {
+        	        bot.startBot();
+        	} catch (IOException e) {
+                SerializeService.saveUserList(userList);
+                e.printStackTrace();
+            } catch (IrcException e) {
+                SerializeService.saveUserList(userList);
+                e.printStackTrace();
+            }       	
+        	
+        }
+    
+    /**
+     * @param configFile
+     * @return
+     */
+    private static Properties readConfig(String configFile) {
         Properties prop = new Properties();
         FileInputStream in = null;
         try {
@@ -48,40 +84,6 @@ public class RaspiPircx {
             }
         }
         
-        String botNick = prop.getProperty("botNick");
-        String login = prop.getProperty("login");
-        String channel = prop.getProperty("channel");
-        String server = prop.getProperty("server");
-        int port = Integer.parseInt(prop.getProperty("port"));
-        
-        
-        
-        userList = SerializeService.loadUserList();
-        	//Setup this bot
-        	Configuration<PircBotX> configuration = new Configuration.Builder<PircBotX>()
-        	        .setName(botNick) //Set the nick of the bot. CHANGE IN YOUR CODE
-        	        .setLogin(login) //login part of hostmask, eg name:login@host
-        	        .setAutoNickChange(true) //Automatically change nick when the current one is in use
-        	        .setCapEnabled(true) //Enable CAP features
-        	        .addListener(new XpListener(userList)) //This class is a listener, so add it to the bots known listeners
-        	        .addListener(new CommandListener(userList))
-        	        .setServerHostname(server)
-        	        .setServerPort(port)
-        	        .setSocketFactory(SSLSocketFactory.getDefault())
-        	        .addAutoJoinChannel(channel) //Join the official #pircbotx channel
-        	        .buildConfiguration();
-        	PircBotX bot = new PircBotX(configuration);
-
-        	//Connect to server
-        	try {
-        	        bot.startBot();
-        	} catch (IOException e) {
-                SerializeService.saveUserList(userList);
-                e.printStackTrace();
-            } catch (IrcException e) {
-                SerializeService.saveUserList(userList);
-                e.printStackTrace();
-            }       	
-        	
-        }
+        return prop;
+    }
 }
