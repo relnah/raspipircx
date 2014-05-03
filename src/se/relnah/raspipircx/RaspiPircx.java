@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -22,9 +24,12 @@ public class RaspiPircx {
     private static List<BotUser> userList = new ArrayList<BotUser>();
     public static void main(String[] args) {
 
+        //Get config
         Properties conf = readConfig("./conf/conf.properties");
         
+        //Load list of users
         userList = SerializeService.loadUserList();
+        
         	//Setup this bot
         	Configuration<PircBotX> configuration = new Configuration.Builder<PircBotX>()
         	        .setName(conf.getProperty("botNick")) //Set the nick of the bot.
@@ -40,9 +45,26 @@ public class RaspiPircx {
         	        .buildConfiguration();
         	PircBotX bot = new PircBotX(configuration);
 
+
+            //Create timer to save userlist.
+            Timer timer = new Timer(true);
+            
+            TimerTask saveUserListTask = new TimerTask() {
+                
+                @Override
+                public void run() {
+                    SerializeService.saveUserList(userList);
+                }
+            };
+            
+            //Schedule task
+            timer.schedule(saveUserListTask, 30 * 1000, 5 * 60 * 1000);
+        	
+        	
+        	
         	//Connect to server
         	try {
-        	        bot.startBot();
+        	    bot.startBot();
         	} catch (IOException e) {
                 SerializeService.saveUserList(userList);
                 e.printStackTrace();
@@ -52,6 +74,8 @@ public class RaspiPircx {
             }       	
         	
         }
+    
+    
     
     /**
      * @param configFile
