@@ -2,6 +2,7 @@ package se.relnah.raspipircx.listener;
 
 import java.util.List;
 import java.util.Random;
+import java.util.ResourceBundle;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -20,9 +21,11 @@ import se.relnah.raspipircx.service.UtilityService;
 public class XpListener extends ListenerAdapter<PircBotX> {
     
     private List<BotUser> userList;
+    private ResourceBundle textBundle;
     
-    public XpListener(List<BotUser> userList) {
+    public XpListener(List<BotUser> userList, ResourceBundle textBundle) {
         this.userList = userList;
+        this.textBundle = textBundle;
     }
     
     @Override
@@ -52,6 +55,8 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             addXpToUser(newUsr, 150, event);
             newUsr.setLastJoinedTimestamp(event.getTimestamp());
             userList.add(newUsr);
+            
+            event.getUser().send().message(textBundle.getString("info.welcome"));
             
         } else { //Existing user
          

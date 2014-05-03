@@ -4,7 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,6 +20,7 @@ import se.relnah.raspipircx.listener.CommandListener;
 import se.relnah.raspipircx.listener.XpListener;
 import se.relnah.raspipircx.pojo.BotUser;
 import se.relnah.raspipircx.service.SerializeService;
+import se.relnah.raspipircx.service.UtilityService;
 
 public class RaspiPircx {
 
@@ -30,14 +33,17 @@ public class RaspiPircx {
         //Load list of users
         userList = SerializeService.loadUserList();
         
+        //Load texts
+        ResourceBundle textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
+        
         	//Setup this bot
         	Configuration<PircBotX> configuration = new Configuration.Builder<PircBotX>()
         	        .setName(conf.getProperty("botNick")) //Set the nick of the bot.
         	        .setLogin(conf.getProperty("login")) //login part of hostmask, eg name:login@host
         	        .setAutoNickChange(true) //Automatically change nick when the current one is in use
         	        .setCapEnabled(true) //Enable CAP features
-        	        .addListener(new XpListener(userList)) //This class is a listener, so add it to the bots known listeners
-        	        .addListener(new CommandListener(userList))
+        	        .addListener(new XpListener(userList, textBundle)) //This class is a listener, so add it to the bots known listeners
+        	        .addListener(new CommandListener(userList, textBundle))
         	        .setServerHostname(conf.getProperty("server"))
         	        .setServerPort(Integer.parseInt(conf.getProperty("port")))
         	        .setSocketFactory(SSLSocketFactory.getDefault())

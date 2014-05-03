@@ -4,6 +4,8 @@
 package se.relnah.raspipircx.listener;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.ListenerAdapter;
@@ -20,9 +22,11 @@ import se.relnah.raspipircx.service.UtilityService;
 public class CommandListener extends ListenerAdapter<PircBotX> {
     
     private List<BotUser> userList;
+    private ResourceBundle textBundle;
     
-    public CommandListener(List<BotUser> userList) {
+    public CommandListener(List<BotUser> userList, ResourceBundle textBundle) {
         this.userList = userList;
+        this.textBundle = textBundle;
     }
     
 
@@ -40,6 +44,8 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                 event.respond("Savid user list...");
                 SerializeService.saveUserList(userList);
                 event.respond("Saved!");
+            } else if (event.getMessage().equals(".reloadTexts")) { //Reloads application texts
+                textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
             }
             
         }
@@ -54,6 +60,8 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
             response = "Nick: " + usr.getNick() + " XP: " + usr.getXp() + " Level: " + usr.getLevel();
             
             event.respond(response);
+        } else if (event.getMessage().equals(".help")) {
+            event.respond(textBundle.getString("info.help"));
         }
         
         
