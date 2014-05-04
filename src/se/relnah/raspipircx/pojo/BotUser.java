@@ -37,6 +37,7 @@ public class BotUser implements Serializable {
         this.level = 0;
         this.consecutiveDays = 1;
         this.titles = new ArrayList<String>();
+        titles.add(0, "");
         this.choosenTitleIndex = 0;
     }
 
@@ -170,6 +171,14 @@ public class BotUser implements Serializable {
      */
     public void setChoosenTitleIndex(int choosenTitleIndex) {
         this.choosenTitleIndex = choosenTitleIndex;
+    }
+
+    /**
+     * Get the title the user has selected as active
+     * @return String title
+     */
+    public String getSelectedTitle() {
+        return titles.get(choosenTitleIndex);
     }
     
 }

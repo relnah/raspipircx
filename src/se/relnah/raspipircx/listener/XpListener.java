@@ -32,6 +32,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     public void onJoin(JoinEvent<PircBotX> event) throws Exception {
         
         String nick = event.getUser().getNick();
+        int joinXp = 0;
         
         if (nick.equals(event.getBot().getNick())) {
             return;
@@ -50,13 +51,15 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         
         //New user
         if (!foundUser) {
-            BotUser newUsr = new BotUser(nick);
-            newUsr.setHostMask(event.getUser().getHostmask());
-            addXpToUser(newUsr, 150, event);
-            newUsr.setLastJoinedTimestamp(event.getTimestamp());
-            userList.add(newUsr);
+            currentUser = new BotUser(nick);
+            currentUser.setHostMask(event.getUser().getHostmask());
+            joinXp = 150;
+            currentUser.setLastJoinedTimestamp(event.getTimestamp());
+            userList.add(currentUser);
             
             event.getUser().send().message(textBundle.getString("info.welcome"));
+            event.getUser().send().message(textBundle.getString("info.welcome_2"));
+            event.getUser().send().message(textBundle.getString("info.welcome_3"));
             
         } else { //Existing user
          
@@ -79,7 +82,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
                     currentUser.setConsecutiveDays(1);
                 }
                 
-                addXpToUser(currentUser, xp, event);
+                joinXp = xp;
                 
                 currentUser.setLastJoinedTimestamp(event.getTimestamp());
             }
@@ -91,6 +94,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         String greeting = getGreeting(currentUser, event.getTimestamp());
         
         event.respond(greeting);
+        addXpToUser(currentUser, joinXp, event);
         
     }
     
@@ -109,12 +113,12 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         
         //public actions
         
-        if (event.getMessage().startsWith(".kudos")) { // Rewards XP. Usage: .kudos <nick>
+        if (event.getMessage().startsWith(".tack")) { // Rewards XP. Usage: .tack <nick>
             String[] param = event.getMessage().split(" ");
             
             BotUser usr = UtilityService.getUser(param[1], userList);
             
-            if (usr != null) {
+            if (usr != null && !(usr.getNick().equalsIgnoreCase(event.getUser().getNick())) ) {
                 int xp = 50;
                 
                 //Add random xp, 0-10

@@ -46,6 +46,10 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                 event.respond("Saved!");
             } else if (event.getMessage().equals(".reloadTexts")) { //Reloads application texts
                 textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
+            } else if (event.getMessage().startsWith(".awardTitle")) {
+                String[] param = event.getMessage().split(" ");
+                BotUser usr = UtilityService.getUser(param[1], userList);
+                usr.addTitle(param[2]);
             }
             
         }
@@ -53,15 +57,54 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
         //public commands
         
         //Send user info
-        if(event.getMessage().equals(".myInfo")) {
-            String response = "Sorry, could not find you in the records...";
+        if(event.getMessage().equals(".minInfo")) {
+            String response = textBundle.getString("command.myInfo.userNotFound");
             
             BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);
-            response = "Nick: " + usr.getNick() + " XP: " + usr.getXp() + " Level: " + usr.getLevel();
+            
+            if (usr != null) {
+                response = "Nick: " + usr.getNick() + " Titel: " + usr.getSelectedTitle() + " XP: " + usr.getXp() + " Level: " + usr.getLevel();
+            }
             
             event.respond(response);
-        } else if (event.getMessage().equals(".help")) {
+        } else if (event.getMessage().equals(".hjälp")) { //Show help message ----------------------------------------------
             event.respond(textBundle.getString("info.help"));
+        } else if (event.getMessage().equals(".titlar")) { //List awarded titles -------------------------------------------
+            BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);
+            event.respond(textBundle.getString("command.titles.heading"));
+            
+            //Loop and print awarded titles. Mark selected title.
+            for (int i = 0; i < usr.getTitles().size(); i++) {
+                String response = i + ": " + usr.getTitles().get(i);
+                if (i == usr.getChoosenTitleIndex()) {
+                    response += " " + textBundle.getString("command.titles.isSelected");
+                }
+                event.respond(response);
+                
+                Thread.sleep(100);
+            }
+            
+            event.respond(textBundle.getString("command.titles.endInfo"));
+        } else if (event.getMessage().startsWith(".väljTitel")) { //Selects the active title ---------------------------------
+            String[] param = event.getMessage().split(" ");
+            BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);
+
+            //Catch NaN
+            try {
+                int selectedIndex = Integer.parseInt(param[1]);
+                //Make sure to skip OOB
+                if (selectedIndex < usr.getTitles().size()) {
+                    usr.setChoosenTitleIndex(selectedIndex);
+                    event.respond(textBundle.getString("command.selectTitle.confirm") + " " + usr.getTitles().get(selectedIndex));
+                    event.respond(textBundle.getString("command.selectTitle.exampleGreeting") + " " + usr.getNick() + " " + usr.getSelectedTitle());
+                } else {
+                    event.respond(textBundle.getString("command.selectTitle.wrongIndex"));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                event.respond(textBundle.getString("command.selectTitle.wrongIndex"));
+            }
+
         }
         
         
