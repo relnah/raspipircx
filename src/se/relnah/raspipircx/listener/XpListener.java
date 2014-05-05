@@ -34,6 +34,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         String nick = event.getUser().getNick();
         int joinXp = 0;
         
+        //Don't listen to the bot itself
         if (nick.equals(event.getBot().getNick())) {
             return;
         }
@@ -102,18 +103,21 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     @Override
     public void onMessage(MessageEvent<PircBotX> event) throws Exception{
         
+        //Don't listen to the bot itself
         if (event.getUser().getNick().equals(event.getBot().getNick())) {
             return;
         }
         
         if (event.getUser().getNick().equals("David_B")) {
-            
+            //Do separate check on verified. Minimize impact of expensive check.
+            if (event.getUser().isVerified()) {
+            }            
             //admin actions
         }
         
         //public actions
         
-        if (event.getMessage().startsWith(".tack")) { // Rewards XP. Usage: .tack <nick>
+        if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.kudos").toLowerCase())) { // Rewards XP. Usage: .tack <nick>
             String[] param = event.getMessage().split(" ");
             
             BotUser usr = UtilityService.getUser(param[1], userList);
@@ -125,7 +129,8 @@ public class XpListener extends ListenerAdapter<PircBotX> {
                 Random r = new Random();
                 xp += r.nextInt(11);
                 
-                event.respond(usr.getNick() + " fick " + xp + " XP av " + event.getUser().getNick() + " som tack för hjälpen!");
+                event.respond(UtilityService.getText(textBundle, "command.kudos.userRewarded", new String[] {usr.getNick(), Integer.toString(xp), event.getUser().getNick()}));
+                
                 Thread.sleep(10);
                 addXpToUser(usr, xp, event);
             }
@@ -139,18 +144,21 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             throws Exception {
         //Check if admin
         if (event.getUser().getNick().equals("David_B")) {
-            
-            //admin commands
-            
-            //Add xp to user. Usage: .addXp <user> <xp>
-            if(event.getMessage().startsWith(".addXp")) {
-                String[] param = event.getMessage().split(" ");
-                
-                event.respond("Add " + param[2] + " to " + param[1]);
+            //Do separate check on verified. Minimize impact of expensive check.
+            if (event.getUser().isVerified()) {
 
-                BotUser usr = UtilityService.getUser(param[1], userList);
-                addXpToUser(usr, Integer.parseInt(param[2]), event);
+                //admin commands
                 
+                //Add xp to user. Usage: .addXp <user> <xp>
+                if(event.getMessage().toLowerCase().startsWith(textBundle.getString("command.admin.addXp").toLowerCase())) {
+                    String[] param = event.getMessage().split(" ");
+                    
+                    event.respond(UtilityService.getText(textBundle, "command.admin.addXp.respond", new String[] {param[2], param[1]}));
+    
+                    BotUser usr = UtilityService.getUser(param[1], userList);
+                    addXpToUser(usr, Integer.parseInt(param[2]), event);
+                    
+                }
             }
         }
     }
@@ -168,12 +176,11 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         int hour = now.getHourOfDay();
         
         if (hour >= 6 && hour <= 9) {
-            greeting += "God morgon ";
+            greeting = textBundle.getString("general.onJoin.greeting.morning");
         } else {
-            greeting += "Hej ";
+            greeting = textBundle.getString("general.onJoin.greeting.default");
         }
         
-        greeting += "!";
         
         return greeting;
     
@@ -193,7 +200,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         
         if (calculatedLevel > usr.getLevel()) {
             usr.setLevel(calculatedLevel);
-            event.respond("Ding! " + usr.getNick() + " leveled up and is now level " + usr.getLevel() + ". Congratulations!");
+            event.respond(UtilityService.getText(textBundle, "general.levelUp", new String[] {usr.getNick(), Integer.toString(usr.getLevel())}));
         }
         
     }

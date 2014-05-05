@@ -7,6 +7,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -62,6 +63,25 @@ public final class UtilityService {
         ResourceBundle textBundle = ResourceBundle.getBundle(baseName, locale, loader);
         return textBundle;
     }
+    
+    /**
+     * Takes bundle key, data arguments and fills placeholder with data.
+     * @param textBundle 
+     * @param bundleKey
+     * @param arguments
+     * @return String
+     */
+    public static String getText(ResourceBundle textBundle, String bundleKey, String[] arguments) {
+        MessageFormat formatter = new MessageFormat("");
+        
+        formatter.setLocale(textBundle.getLocale());
+
+        formatter.applyPattern(textBundle.getString(bundleKey));
+        
+        return formatter.format(arguments);
+        
+    }
+
     
     
 

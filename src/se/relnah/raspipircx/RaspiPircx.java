@@ -84,6 +84,7 @@ public class RaspiPircx {
     
     
     /**
+     * Read the config file
      * @param configFile
      * @return
      */
