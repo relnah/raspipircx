@@ -8,9 +8,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+
+import org.pircbotx.User;
 
 import se.relnah.raspipircx.pojo.BotUser;
 
@@ -80,6 +86,68 @@ public final class UtilityService {
         
         return formatter.format(arguments);
         
+    }
+
+    /**
+     * Reads resourcebundle and extracts available commands.
+     * @param textBundle
+     * @return
+     */
+    public static Map<String, List<Map<String, String>>> getCommands(
+            ResourceBundle textBundle) {
+
+        Map<String, List<Map<String, String>>> commands = new HashMap<String, List<Map<String, String>>>();
+        List<Map<String, String>> publicCommands = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> adminCommands = new ArrayList<Map<String, String>>();
+
+        Enumeration<String> enumKeys = textBundle.getKeys();
+        
+        while (enumKeys.hasMoreElements()) {
+            String key = enumKeys.nextElement();
+            
+            //public commands
+            if (key.startsWith("command.") && !key.startsWith("command.admin.")) {
+                String command = key.substring(key.indexOf('.') + 1, key.length());
+                if (!command.contains(".")) {
+                    Map<String, String> commandMap = new HashMap<String, String>();
+                    commandMap.put("key", command);
+                    commandMap.put("command", textBundle.getString("command." + command));
+                    publicCommands.add(commandMap);
+                }
+            } else if (key.startsWith("command.admin.")) { //admin commands
+                String command = key.substring(key.indexOf('.', key.indexOf('.') + 1) + 1, key.length());
+                if (!command.contains(".")) {
+                    Map<String, String> commandMap = new HashMap<String, String>();
+                    commandMap.put("key", command);
+                    commandMap.put("command", textBundle.getString("command.admin." + command));
+                    adminCommands.add(commandMap);
+                }
+            }
+            
+         }
+        
+        commands.put("public", publicCommands);
+        commands.put("admin", adminCommands);
+        
+        return commands;
+    }
+
+    /**
+     * Checks if users nick matches admin and if user is verified
+     * @param user
+     * @return boolean
+     */
+    public static boolean isAdmin(User user) {
+        
+        if (user.getNick().equals("David_B")) {
+            
+            //Do separate check on verified. Minimize impact of expensive check.
+            if (user.isVerified()) {
+                return true;
+            }
+           
+        }
+        return false;
     }
 
     

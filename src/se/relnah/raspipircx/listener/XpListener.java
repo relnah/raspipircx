@@ -58,9 +58,9 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             currentUser.setLastJoinedTimestamp(event.getTimestamp());
             userList.add(currentUser);
             
-            event.getUser().send().message(textBundle.getString("info.welcome"));
+            event.getUser().send().message(UtilityService.getText(textBundle, "info.welcome", new String[] {textBundle.getString("command.kudos")}));
             event.getUser().send().message(textBundle.getString("info.welcome_2"));
-            event.getUser().send().message(textBundle.getString("info.welcome_3"));
+            event.getUser().send().message(UtilityService.getText(textBundle, "info.welcome_3", new String[] {textBundle.getString("command.help")}));
             
         } else { //Existing user
          

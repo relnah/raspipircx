@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -65,8 +66,6 @@ public class RaspiPircx {
             
             //Schedule task
             timer.schedule(saveUserListTask, 30 * 1000, 5 * 60 * 1000);
-        	
-        	
         	
         	//Connect to server
         	try {

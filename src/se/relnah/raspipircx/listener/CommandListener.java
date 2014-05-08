@@ -5,6 +5,7 @@ package se.relnah.raspipircx.listener;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.pircbotx.PircBotX;
@@ -33,36 +34,34 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
     @Override
     public void onPrivateMessage(PrivateMessageEvent<PircBotX> event)
             throws Exception {
-
+        boolean isAdmin = false;
         //Check if admin
-        if (event.getUser().getNick().equals("David_B")) {
+        if (UtilityService.isAdmin(event.getUser())) {
+
+            isAdmin = true;
+            //admin commands
             
-                //Do separate check on verified. Minimize impact of expensive check.
-                if (event.getUser().isVerified()) {
-                //admin commands
+            //Save userlist to file
+            if(event.getMessage().equals(textBundle.getString("command.admin.save"))) {
+                event.respond(textBundle.getString("command.admin.save.beginSave"));
+                SerializeService.saveUserList(userList);
+                event.respond(textBundle.getString("command.admin.save.saved"));
+            } else if (event.getMessage().equalsIgnoreCase(textBundle.getString("command.admin.reloadTexts"))) { //Reloads application texts
+                textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
+            } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.admin.awardTitle").toLowerCase())) {
+                String[] param = event.getMessage().split(" ");
+                BotUser usr = UtilityService.getUser(param[1], userList);
                 
-                //Save userlist to file
-                if(event.getMessage().equals(textBundle.getString("command.admin.save"))) {
-                    event.respond(textBundle.getString("command.admin.save.beginSave"));
-                    SerializeService.saveUserList(userList);
-                    event.respond(textBundle.getString("command.admin.save.saved"));
-                } else if (event.getMessage().equalsIgnoreCase(textBundle.getString("command.admin.reloadTexts"))) { //Reloads application texts
-                    textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
-                } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.admin.awardTitle").toLowerCase())) {
-                    String[] param = event.getMessage().split(" ");
-                    BotUser usr = UtilityService.getUser(param[1], userList);
-                    
-                    //Params from index 2 and onwards are all part of the title.
-                    String title = "";
-                    for (int i = 2; i < param.length; i++) {
-                        title += param[i] + " ";
-                    }
-                    
-                    //Remove trailing space added from last iteration of loop.
-                    usr.addTitle(title.trim());
+                //Params from index 2 and onwards are all part of the title.
+                String title = "";
+                for (int i = 2; i < param.length; i++) {
+                    title += param[i] + " ";
                 }
                 
+                //Remove trailing space added from last iteration of loop.
+                usr.addTitle(title.trim());
             }
+            
         }
         
         //public commands
@@ -80,9 +79,55 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
             }
             
             event.respond(response);
-        } else if (event.getMessage().equalsIgnoreCase(textBundle.getString("command.help"))) { //Show help message ----------------------------------------------
-            event.respond(textBundle.getString("info.help"));
+        } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.help").toLowerCase())) { //Show help ---------------------------------------
+
+            String[] param = event.getMessage().trim().split(" ");
+            Map<String, List<Map<String, String>>> commands = UtilityService.getCommands(textBundle);
+            
+            //Check if .help or .help <command>
+            if (param.length < 2) {
+            
+                event.respond(UtilityService.getText(textBundle, "info.help", new String[] {textBundle.getString("command.help")}));
+    
+                //Check if admin
+                if (isAdmin) {
+                    event.respond(textBundle.getString("info.help.admin"));
+                    //admin commands
+                    for (Map<String, String> command : commands.get("admin")) {
+                        event.respond(command.get("command"));
+                    }
+                }
+                
+                event.respond(textBundle.getString("info.help.public"));
+                //public commands
+                for (Map<String, String> command : commands.get("public")) {
+                    event.respond(command.get("command"));
+                }
+                
+            } else {
+                
+                if (isAdmin) {
+                    //admin commands
+                    for (Map<String, String> command : commands.get("admin")) {
+                        if (command.get("command").equalsIgnoreCase(param[1])){
+                            event.respond(UtilityService.getText(textBundle, "command.admin." + command.get("key") + ".help", new String[] {command.get("command")}));
+                        }
+                    }
+                }
+                
+                //public commands
+                for (Map<String, String> command : commands.get("public")) {
+                    if (command.get("command").equalsIgnoreCase(param[1])){
+                        event.respond(UtilityService.getText(textBundle, "command." + command.get("key") + ".help", new String[] {command.get("command")}));
+                    }
+                }
+                
+                
+            }
+
+            
         } else if (event.getMessage().equalsIgnoreCase(textBundle.getString("command.titles"))) { //List awarded titles -------------------------------------------
+
             BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);
             event.respond(textBundle.getString("command.titles.heading"));
             
@@ -97,7 +142,7 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                 Thread.sleep(100);
             }
             
-            event.respond(textBundle.getString("command.titles.endInfo"));
+            event.respond(UtilityService.getText(textBundle, "command.titles.endInfo", new String[] {textBundle.getString("command.SelectTitle")}));
         } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.selectTitle").toLowerCase())) { //Selects the active title ---------------------------------
             String[] param = event.getMessage().split(" ");
             BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);
