@@ -142,7 +142,7 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                 Thread.sleep(100);
             }
             
-            event.respond(UtilityService.getText(textBundle, "command.titles.endInfo", new String[] {textBundle.getString("command.SelectTitle")}));
+            event.respond(UtilityService.getText(textBundle, "command.titles.endInfo", new String[] {textBundle.getString("command.selectTitle")}));
         } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.selectTitle").toLowerCase())) { //Selects the active title ---------------------------------
             String[] param = event.getMessage().split(" ");
             BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);

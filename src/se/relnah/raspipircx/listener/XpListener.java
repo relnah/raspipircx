@@ -7,16 +7,20 @@ import java.util.ResourceBundle;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.DisconnectEvent;
 import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
+import org.pircbotx.hooks.events.UserListEvent;
 
 import se.relnah.raspipircx.pojo.BotUser;
 import se.relnah.raspipircx.service.SerializeService;
 import se.relnah.raspipircx.service.UtilityService;
+
+import com.google.common.collect.ImmutableSortedSet;
 
 public class XpListener extends ListenerAdapter<PircBotX> {
     
@@ -30,21 +34,51 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     
     @Override
     public void onJoin(JoinEvent<PircBotX> event) throws Exception {
-        
-        String nick = event.getUser().getNick();
-        int joinXp = 0;
-        
+
         //Don't listen to the bot itself
-        if (nick.equals(event.getBot().getNick())) {
+        if (event.getUser().getNick().equals(event.getBot().getNick())) {
             return;
         }
+        BotUser currentUser = UtilityService.getUser(event.getUser().getNick(), userList);
+
+        //Greet joining users.
+        String greeting = getGreeting(currentUser, event.getTimestamp());
+        
+        event.respond(greeting);
+        
+        doUserCheck(event.getUser(), currentUser, event);
+    }
+    
+    @Override
+    public void onUserList(UserListEvent<PircBotX> event) throws Exception {
+        
+        ImmutableSortedSet<User> users = event.getUsers();
+        
+        for (User user : users) {
+            //Don't listen to the bot itself
+            if (user.getNick().equals(event.getBot().getNick())) {
+                return;
+            }
+            
+            BotUser currentUser = UtilityService.getUser(user.getNick(), userList);
+            doUserCheck(user, currentUser, event);
+        }
+        
+    }
+   
+    /**
+     * Checks if user is new or existing, checks consecutive days logged in, grants XP for daily login.
+     * @param user
+     * @param currentUser
+     * @param event
+     */
+    private void doUserCheck(User user, BotUser currentUser, Event<PircBotX> event) {
+        String nick = user.getNick();
+        int joinXp = 0;
         
         Boolean foundUser = false;
-        BotUser currentUser = null;
 
         //Check if new user
-        
-        currentUser = UtilityService.getUser(event.getUser().getNick(), userList);
         
         if (currentUser != null) {
             foundUser = true;
@@ -53,14 +87,14 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         //New user
         if (!foundUser) {
             currentUser = new BotUser(nick);
-            currentUser.setHostMask(event.getUser().getHostmask());
+            currentUser.setHostMask(user.getHostmask());
             joinXp = 150;
             currentUser.setLastJoinedTimestamp(event.getTimestamp());
             userList.add(currentUser);
             
-            event.getUser().send().message(UtilityService.getText(textBundle, "info.welcome", new String[] {textBundle.getString("command.kudos")}));
-            event.getUser().send().message(textBundle.getString("info.welcome_2"));
-            event.getUser().send().message(UtilityService.getText(textBundle, "info.welcome_3", new String[] {textBundle.getString("command.help")}));
+            user.send().message(UtilityService.getText(textBundle, "info.welcome", new String[] {textBundle.getString("command.kudos")}));
+            user.send().message(textBundle.getString("info.welcome_2"));
+            user.send().message(UtilityService.getText(textBundle, "info.welcome_3", new String[] {textBundle.getString("command.help")}));
             
         } else { //Existing user
          
@@ -90,15 +124,9 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             
         }
         
-
-        //Greet joining users.
-        String greeting = getGreeting(currentUser, event.getTimestamp());
-        
-        event.respond(greeting);
         addXpToUser(currentUser, joinXp, event);
         
     }
-    
 
     @Override
     public void onMessage(MessageEvent<PircBotX> event) throws Exception{
@@ -181,6 +209,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             greeting = textBundle.getString("general.onJoin.greeting.default");
         }
         
+        greeting += " " + currentUser.getSelectedTitle();
         
         return greeting;
     
