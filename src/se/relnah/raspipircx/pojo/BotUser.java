@@ -25,6 +25,9 @@ public class BotUser implements Serializable {
     private int consecutiveDays;
     private ArrayList<String> titles;
     private int choosenTitleIndex;
+    private int numTypedLines;
+    private int numKudosGiven;
+    private int numKudosRecieved;
     
     
     
@@ -39,6 +42,9 @@ public class BotUser implements Serializable {
         this.titles = new ArrayList<String>();
         titles.add(0, "");
         this.choosenTitleIndex = 0;
+        this.numTypedLines = 0;
+        this.numKudosGiven = 0;
+        this.numKudosRecieved = 0;
     }
 
     /**

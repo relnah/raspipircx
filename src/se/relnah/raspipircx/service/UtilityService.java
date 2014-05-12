@@ -137,9 +137,9 @@ public final class UtilityService {
      * @param user
      * @return boolean
      */
-    public static boolean isAdmin(User user) {
+    public static boolean isAdmin(User user, String message) {
         
-        if (user.getNick().equals("David_B")) {
+        if (user.getNick().equals("David_B") && message.startsWith(".")) {
             
             //Do separate check on verified. Minimize impact of expensive check.
             if (user.isVerified()) {

@@ -36,7 +36,7 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
             throws Exception {
         boolean isAdmin = false;
         //Check if admin
-        if (UtilityService.isAdmin(event.getUser())) {
+        if (UtilityService.isAdmin(event.getUser(), event.getMessage())) {
 
             isAdmin = true;
             //admin commands

@@ -136,10 +136,9 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             return;
         }
         
-        if (event.getUser().getNick().equals("David_B")) {
-            //Do separate check on verified. Minimize impact of expensive check.
-            if (event.getUser().isVerified()) {
-            }            
+        //Check if admin
+        if (UtilityService.isAdmin(event.getUser(), event.getMessage())) {
+
             //admin actions
         }
         
@@ -171,22 +170,18 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     public void onPrivateMessage(PrivateMessageEvent<PircBotX> event)
             throws Exception {
         //Check if admin
-        if (event.getUser().getNick().equals("David_B")) {
-            //Do separate check on verified. Minimize impact of expensive check.
-            if (event.getUser().isVerified()) {
+        if (UtilityService.isAdmin(event.getUser(), event.getMessage())) {
 
-                //admin commands
+            //admin commands
+            
+            //Add xp to user. Usage: .addXp <user> <xp>
+            if(event.getMessage().toLowerCase().startsWith(textBundle.getString("command.admin.addXp").toLowerCase())) {
+                String[] param = event.getMessage().split(" ");
                 
-                //Add xp to user. Usage: .addXp <user> <xp>
-                if(event.getMessage().toLowerCase().startsWith(textBundle.getString("command.admin.addXp").toLowerCase())) {
-                    String[] param = event.getMessage().split(" ");
-                    
-                    event.respond(UtilityService.getText(textBundle, "command.admin.addXp.respond", new String[] {param[2], param[1]}));
-    
-                    BotUser usr = UtilityService.getUser(param[1], userList);
-                    addXpToUser(usr, Integer.parseInt(param[2]), event);
-                    
-                }
+                event.respond(UtilityService.getText(textBundle, "command.admin.addXp.respond", new String[] {param[2], param[1]}));
+
+                BotUser usr = UtilityService.getUser(param[1], userList);
+                addXpToUser(usr, Integer.parseInt(param[2]), event);
             }
         }
     }
