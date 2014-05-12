@@ -36,7 +36,6 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     public void onJoin(JoinEvent<PircBotX> event) throws Exception {
 
         //Don't listen to the bot itself
-        System.out.println(event.getUser().getNick() + " -- " + event.getBot().getNick());
         if (event.getUser().getNick().equals(event.getBot().getNick())) {
             return;
         }
@@ -57,10 +56,9 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         ImmutableSortedSet<User> users = event.getUsers();
         
         for (User user : users) {
-            System.out.println(user.getNick() + " -- " + event.getBot().getNick());
+            
             //Don't listen to the bot itself
             if (user.getNick().equals(event.getBot().getNick())) {
-                System.out.println(user.getNick() + " -- " + event.getBot().getNick());
                 continue;
             }
             
