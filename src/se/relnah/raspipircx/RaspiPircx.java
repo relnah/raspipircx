@@ -2,6 +2,7 @@ package se.relnah.raspipircx;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -48,6 +49,7 @@ public class RaspiPircx {
         	        .setServerPort(Integer.parseInt(conf.getProperty("port")))
         	        .setSocketFactory(SSLSocketFactory.getDefault())
         	        .addAutoJoinChannel(conf.getProperty("channel"))
+        	        .setEncoding(Charset.forName("ISO-8859-1"))
         	        .buildConfiguration();
         	PircBotX bot = new PircBotX(configuration);
 
