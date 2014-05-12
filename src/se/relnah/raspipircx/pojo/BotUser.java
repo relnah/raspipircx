@@ -67,6 +67,26 @@ public class BotUser implements Serializable {
     }
     
     /**
+     * Increas the number of kudos user has given to other users by 1.
+     * Returns the new sum.
+     * @return
+     */
+    public int increasKudosGiven() {
+        this.numKudosGiven++;
+        return numKudosGiven;
+    }
+    
+    /**
+     * Increas number of kudos user has recieved from other users by 1.
+     * Returns the new sum.
+     * @return
+     */
+    public int increasKudosRecieved() {
+        this.numKudosRecieved++;
+        return numKudosRecieved;
+    }
+    
+    /**
      * @return the nick
      */
     public String getNick() {
@@ -185,6 +205,15 @@ public class BotUser implements Serializable {
      */
     public String getSelectedTitle() {
         return titles.get(choosenTitleIndex);
+    }
+
+    /**
+     * Increases number of lines typed by user by 1. Returns new sum.
+     * @return
+     */
+    public int increasLinesTyped() {
+        this.numTypedLines++;
+        return numTypedLines;
     }
     
 }

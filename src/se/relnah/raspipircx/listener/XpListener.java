@@ -140,6 +140,9 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             return;
         }
         
+        UtilityService.getUser(event.getUser().getNick(), userList).increasLinesTyped();
+        
+        
         //Check if admin
         if (UtilityService.isAdmin(event.getUser(), event.getMessage())) {
 
@@ -161,6 +164,10 @@ public class XpListener extends ListenerAdapter<PircBotX> {
                 xp += r.nextInt(11);
                 
                 event.respond(UtilityService.getText(textBundle, "command.kudos.userRewarded", new String[] {usr.getNick(), Integer.toString(xp), event.getUser().getNick()}));
+                
+                //Increas kudos recieved and given for the users involved.
+                usr.increasKudosRecieved();
+                UtilityService.getUser(event.getUser().getNick(), userList).increasKudosGiven();
                 
                 Thread.sleep(10);
                 addXpToUser(usr, xp, event);
