@@ -41,12 +41,13 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         }
         BotUser currentUser = UtilityService.getUser(event.getUser().getNick(), userList);
 
+        doUserCheck(event.getUser(), currentUser, event);
+
         //Greet joining users.
         String greeting = getGreeting(currentUser, event.getTimestamp());
         
         event.respond(greeting);
         
-        doUserCheck(event.getUser(), currentUser, event);
     }
     
     @Override
@@ -224,7 +225,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         
         if (calculatedLevel > usr.getLevel()) {
             usr.setLevel(calculatedLevel);
-            event.respond(UtilityService.getText(textBundle, "general.levelUp", new String[] {usr.getNick(), Integer.toString(usr.getLevel())}));
+            event.respond(UtilityService.getText(textBundle, "general.levelUp", new String[] {usr.getNick(), usr.getSelectedTitle(), Integer.toString(usr.getLevel())}));
         }
         
     }
