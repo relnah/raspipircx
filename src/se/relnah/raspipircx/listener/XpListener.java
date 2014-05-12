@@ -36,12 +36,13 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     public void onJoin(JoinEvent<PircBotX> event) throws Exception {
 
         //Don't listen to the bot itself
+        System.out.println(event.getUser().getNick() + " -- " + event.getBot().getNick());
         if (event.getUser().getNick().equals(event.getBot().getNick())) {
             return;
         }
         BotUser currentUser = UtilityService.getUser(event.getUser().getNick(), userList);
 
-        doUserCheck(event.getUser(), currentUser, event);
+        currentUser = doUserCheck(event.getUser(), currentUser, event);
 
         //Greet joining users.
         String greeting = getGreeting(currentUser, event.getTimestamp());
@@ -56,9 +57,11 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         ImmutableSortedSet<User> users = event.getUsers();
         
         for (User user : users) {
+            System.out.println(user.getNick() + " -- " + event.getBot().getNick());
             //Don't listen to the bot itself
             if (user.getNick().equals(event.getBot().getNick())) {
-                return;
+                System.out.println(user.getNick() + " -- " + event.getBot().getNick());
+                continue;
             }
             
             BotUser currentUser = UtilityService.getUser(user.getNick(), userList);
@@ -72,8 +75,9 @@ public class XpListener extends ListenerAdapter<PircBotX> {
      * @param user
      * @param currentUser
      * @param event
+     * @return 
      */
-    private void doUserCheck(User user, BotUser currentUser, Event<PircBotX> event) {
+    private BotUser doUserCheck(User user, BotUser currentUser, Event<PircBotX> event) {
         String nick = user.getNick();
         int joinXp = 0;
         
@@ -126,6 +130,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         }
         
         addXpToUser(currentUser, joinXp, event);
+        return currentUser;
         
     }
 
