@@ -13,6 +13,7 @@ import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 import se.relnah.raspipircx.pojo.BotUser;
+import se.relnah.raspipircx.pojo.UserTitle;
 import se.relnah.raspipircx.service.SerializeService;
 import se.relnah.raspipircx.service.UtilityService;
 
@@ -44,22 +45,23 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
             //Save userlist to file
             if(event.getMessage().equals(textBundle.getString("command.admin.save"))) {
                 event.respond(textBundle.getString("command.admin.save.beginSave"));
-                SerializeService.saveUserList(userList);
+                SerializeService.saveGsonUserList(userList);
                 event.respond(textBundle.getString("command.admin.save.saved"));
             } else if (event.getMessage().equalsIgnoreCase(textBundle.getString("command.admin.reloadTexts"))) { //Reloads application texts
                 textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
             } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.admin.awardTitle").toLowerCase())) {
                 String[] param = event.getMessage().split(" ");
                 BotUser usr = UtilityService.getUser(param[1], userList);
-                
-                //Params from index 2 and onwards are all part of the title.
+                int levelReq = Integer.parseInt(param[2]);
+
+                //Params from index 3 and onwards are all part of the title.
                 String title = "";
-                for (int i = 2; i < param.length; i++) {
+                for (int i = 3; i < param.length; i++) {
                     title += param[i] + " ";
                 }
                 
                 //Remove trailing space added from last iteration of loop.
-                usr.addTitle(title.trim());
+                usr.addCustomTitle(title.trim(), levelReq);
             }
             
         }
@@ -74,7 +76,7 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
             
             if (usr != null) {
                 
-                response = UtilityService.getText(textBundle, "command.myInfo.userInfo", new String[] {usr.getNick(), usr.getSelectedTitle(), Integer.toString(usr.getXp()), Integer.toString(usr.getLevel())});
+                response = UtilityService.getText(textBundle, "command.myInfo.userInfo", new String[] {usr.getNick(), usr.getSelectedTitle().getTitle(), Integer.toString(usr.getXp()), Integer.toString(usr.getLevel())});
                         
             }
             
@@ -133,7 +135,14 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
             
             //Loop and print awarded titles. Mark selected title.
             for (int i = 0; i < usr.getTitles().size(); i++) {
-                String response = i + ": " + usr.getTitles().get(i);
+                UserTitle title = usr.getTitles().get(i);
+                String response = i + ": " + title.getTitle();
+                response += " " + textBundle.getString("command.titles.levelReq") + " " + title.getLevelReq();
+                
+                if (title.isCustom()) {
+                    response += " " + textBundle.getString("command.titles.isCustom");
+                }
+                
                 if (i == usr.getChoosenTitleIndex()) {
                     response += " " + textBundle.getString("command.titles.isSelected");
                 }
@@ -152,9 +161,17 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                 int selectedIndex = Integer.parseInt(param[1]);
                 //Make sure to skip OOB
                 if (selectedIndex < usr.getTitles().size() && usr.getTitles().size() > -1) {
-                    usr.setChoosenTitleIndex(selectedIndex);
-                    event.respond(UtilityService.getText(textBundle, "command.selectTitle.confirm", new String[] {usr.getTitles().get(selectedIndex)}));
-                    event.respond(UtilityService.getText(textBundle, "command.selectTitle.exampleGreeting", new String[] {usr.getNick(), usr.getSelectedTitle()}));
+
+                    //Check level requirement for title
+                    int levelReq = usr.getTitles().get(selectedIndex).getLevelReq();
+                    if (levelReq <= usr.getLevel()) {
+                        usr.setChoosenTitleIndex(selectedIndex);
+                        event.respond(UtilityService.getText(textBundle, "command.selectTitle.confirm", new String[] {usr.getTitles().get(selectedIndex).getTitle()}));
+                        event.respond(UtilityService.getText(textBundle, "command.selectTitle.exampleGreeting", new String[] {usr.getNick(), usr.getSelectedTitle().getTitle()}));
+                    } else {
+                        event.respond(UtilityService.getText(textBundle, "command.selectTitle.notQualified", new String[] {Integer.toString(levelReq)}));
+                    }
+                    
                 } else {
                     event.respond(textBundle.getString("command.selectTitle.wrongIndex"));
                 }

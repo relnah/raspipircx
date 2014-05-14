@@ -215,7 +215,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             greeting = textBundle.getString("general.onJoin.greeting.default");
         }
         
-        greeting += " " + currentUser.getSelectedTitle();
+        greeting += " " + currentUser.getSelectedTitle().getTitle();
         
         return greeting;
     
@@ -235,7 +235,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         
         if (calculatedLevel > usr.getLevel()) {
             usr.setLevel(calculatedLevel);
-            event.respond(UtilityService.getText(textBundle, "general.levelUp", new String[] {usr.getNick(), usr.getSelectedTitle(), Integer.toString(usr.getLevel())}));
+            event.respond(UtilityService.getText(textBundle, "general.levelUp", new String[] {usr.getNick(), usr.getSelectedTitle().getTitle(), Integer.toString(usr.getLevel())}));
         }
         
     }
@@ -260,7 +260,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
 
     @Override
     public void onDisconnect(DisconnectEvent<PircBotX> event) throws Exception {
-        SerializeService.saveUserList(userList);
+        SerializeService.saveGsonUserList(userList);
     }
     
 }

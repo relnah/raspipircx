@@ -34,6 +34,32 @@ public class RaspiPircx {
         //Load list of users
         userList = SerializeService.loadUserList();
         
+        List<BotUser> newUserList = new ArrayList<BotUser>();
+        for (BotUser botUser : userList) {
+            BotUser tmpBotUser = new BotUser(botUser.getNick());
+            tmpBotUser.setLevel(botUser.getLevel());
+            tmpBotUser.setXp(botUser.getXp());
+            tmpBotUser.setConsecutiveDays(botUser.getConsecutiveDays());
+            tmpBotUser.setHostMask(botUser.getHostMask());
+            tmpBotUser.setLastJoinedTimestamp(botUser.getLastJoinedTimestamp());
+            
+            for (int i = 0; i < botUser.getNumKudosGiven(); i++) {
+                tmpBotUser.increasKudosGiven();
+            }
+            
+            for (int i = 0; i < botUser.getNumKudosRecieved(); i++) {
+                tmpBotUser.increasKudosRecieved();
+            }
+            
+            for (int i = 0; i < botUser.getNumTypedLines(); i++) {
+                tmpBotUser.increasLinesTyped();
+            }
+            
+            newUserList.add(tmpBotUser);
+        }
+        
+       userList = newUserList;
+        
         //Load texts
         ResourceBundle textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
         
@@ -61,7 +87,7 @@ public class RaspiPircx {
                 
                 @Override
                 public void run() {
-                    SerializeService.saveUserList(userList);
+                    SerializeService.saveGsonUserList(userList);
                 }
             };
             
@@ -72,10 +98,10 @@ public class RaspiPircx {
         	try {
         	    bot.startBot();
         	} catch (IOException e) {
-                SerializeService.saveUserList(userList);
+                SerializeService.saveGsonUserList(userList);
                 e.printStackTrace();
             } catch (IrcException e) {
-                SerializeService.saveUserList(userList);
+                SerializeService.saveGsonUserList(userList);
                 e.printStackTrace();
             }       	
         	

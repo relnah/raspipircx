@@ -23,7 +23,7 @@ public class BotUser implements Serializable {
     private int level;
     private long lastJoinedTimestamp;
     private int consecutiveDays;
-    private ArrayList<String> titles;
+    private ArrayList<UserTitle> titles;
     private int choosenTitleIndex;
     private int numTypedLines;
     private int numKudosGiven;
@@ -39,8 +39,8 @@ public class BotUser implements Serializable {
         this.xp = 0;
         this.level = 0;
         this.consecutiveDays = 1;
-        this.titles = new ArrayList<String>();
-        titles.add(0, "");
+        this.titles = new ArrayList<UserTitle>();
+        titles.add(0, new UserTitle("", 0));
         this.choosenTitleIndex = 0;
         this.numTypedLines = 0;
         this.numKudosGiven = 0;
@@ -170,21 +170,36 @@ public class BotUser implements Serializable {
     /**
      * @return the titles
      */
-    public ArrayList<String> getTitles() {
+    public ArrayList<UserTitle> getTitles() {
         return titles;
     }
 
     /**
      * @param titles the titles to set
      */
-    public void setTitles(ArrayList<String> titles) {
+    public void setTitles(ArrayList<UserTitle> titles) {
         this.titles = titles;
     }
     
-    public void addTitle(String title) {
-        this.titles.add(title);
+    /**
+     * Adds a standard title to user
+     * @param title
+     * @param levelReq
+     */
+    public void addTitle(String title, int levelReq) {
+        this.titles.add(new UserTitle(title, levelReq));
     }
 
+    /**
+     * Adds a custom title to user
+     * @param title
+     * @param levelReq
+     * @param isCustom
+     */
+    public void addCustomTitle(String title, int levelReq) {
+        this.titles.add(new UserTitle(title, levelReq, true));
+    }
+    
     /**
      * @return the choosenTitleIndex
      */
@@ -203,7 +218,7 @@ public class BotUser implements Serializable {
      * Get the title the user has selected as active
      * @return String title
      */
-    public String getSelectedTitle() {
+    public UserTitle getSelectedTitle() {
         return titles.get(choosenTitleIndex);
     }
 
@@ -214,6 +229,27 @@ public class BotUser implements Serializable {
     public int increasLinesTyped() {
         this.numTypedLines++;
         return numTypedLines;
+    }
+
+    /**
+     * @return the numTypedLines
+     */
+    public int getNumTypedLines() {
+        return numTypedLines;
+    }
+
+    /**
+     * @return the numKudosGiven
+     */
+    public int getNumKudosGiven() {
+        return numKudosGiven;
+    }
+
+    /**
+     * @return the numKudosRecieved
+     */
+    public int getNumKudosRecieved() {
+        return numKudosRecieved;
     }
     
 }
