@@ -76,30 +76,4 @@ public final class SerializeService {
         
     }    
     
-   
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static List<BotUser> loadUserList() {
-        List<BotUser> userList = new ArrayList<BotUser>();
-        // Deserialize userList
-        try {
-            FileInputStream fileIn = new FileInputStream("./users.txt");
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            userList = (List<BotUser>) in.readObject();
-            in.close();
-            fileIn.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        
-        return userList;
-        
-        
-    }
-
-    
 }

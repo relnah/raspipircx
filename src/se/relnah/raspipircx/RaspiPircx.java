@@ -32,8 +32,9 @@ public class RaspiPircx {
         Properties conf = readConfig("./conf/conf.properties");
         
         //Load list of users
-        userList = SerializeService.loadUserList();
+        userList = SerializeService.loadGsonUserList();
         
+        /* Code to convert userList to new object
         List<BotUser> newUserList = new ArrayList<BotUser>();
         for (BotUser botUser : userList) {
             BotUser tmpBotUser = new BotUser(botUser.getNick());
@@ -59,7 +60,7 @@ public class RaspiPircx {
         }
         
        userList = newUserList;
-        
+        */
         //Load texts
         ResourceBundle textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
         
