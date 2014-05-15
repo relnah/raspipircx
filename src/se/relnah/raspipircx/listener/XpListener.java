@@ -153,8 +153,8 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         
         if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.kudos").toLowerCase())) { // Rewards XP. Usage: .tack <nick>
             String[] param = event.getMessage().split(" ");
-            
-            BotUser usr = UtilityService.getUser(param[1], userList);
+            String paramNick = removeInvalidCharacters(param[1]);
+            BotUser usr = UtilityService.getUser(paramNick, userList);
             
             if (usr != null && !(usr.getNick().equalsIgnoreCase(event.getUser().getNick())) ) {
                 int xp = 50;
@@ -177,6 +177,15 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         
     }
     
+    /**
+     * Removes invalid characters from nick
+     * @param rawNick
+     * @return clean nick
+     */
+    private String removeInvalidCharacters(String rawNick) {
+        return rawNick.replaceAll("[.:,;]","");
+    }
+
     @Override
     public void onPrivateMessage(PrivateMessageEvent<PircBotX> event)
             throws Exception {
