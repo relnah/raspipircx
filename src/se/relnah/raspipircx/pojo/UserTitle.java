@@ -56,6 +56,21 @@ public class UserTitle implements Serializable{
         return levelReq;
     }
 
+    /**
+     * If a title contains text method will return it in quoutes
+     * @return
+     */
+    public String getQuoutedTitle() {
+        
+        String returnTitle = "";
+        
+        if (!"".equals(title) || title == null) {
+            returnTitle = "\"" + title + "\"";
+        }
+        
+        return returnTitle;
+    }
+
 
 
 }

@@ -3,6 +3,8 @@
  */
 package se.relnah.raspipircx.listener;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -10,8 +12,10 @@ import java.util.ResourceBundle;
 
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 
+import se.relnah.raspipircx.comparator.BotUserXPComparatorRev;
 import se.relnah.raspipircx.pojo.BotUser;
 import se.relnah.raspipircx.pojo.UserTitle;
 import se.relnah.raspipircx.service.SerializeService;
@@ -69,7 +73,7 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
         //public commands
         
         //Send user info
-        if(event.getMessage().equalsIgnoreCase(textBundle.getString("command.myInfo"))) {
+        if(event.getMessage().equalsIgnoreCase(textBundle.getString("command.myInfo"))) { //Show users info ------------------------------------------------------------------
             String response = textBundle.getString("command.myInfo.userNotFound");
             
             BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);
@@ -182,6 +186,38 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
 
         }
         
+        
+    }
+    
+    @Override
+    public void onMessage(MessageEvent<PircBotX> event) throws Exception {
+
+        //Don't listen to the bot itself
+        if (event.getUser().getNick().equals(event.getBot().getNick())) {
+            return;
+        }
+        
+        
+        //Check if admin
+        if (UtilityService.isAdmin(event.getUser(), event.getMessage())) {
+
+        }
+        
+        if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.listUsers").toLowerCase())) { //List users stats in channel ------------------------------
+            
+            String[] param = event.getMessage().split(" ");
+            
+            event.getChannel().send().message(textBundle.getString("command.listUsers.heading"));
+            
+            Collections.sort(userList, new BotUserXPComparatorRev());
+            
+            for (BotUser user : userList) {
+                String[] textParams = new String[] {user.getNick(), user.getSelectedTitle().getQuoutedTitle(), Integer.toString(user.getLevel())};
+                event.getChannel().send().message(UtilityService.getText(textBundle, "command.listUsers.userEntry", textParams));
+            }
+            
+            event.getChannel().send().message(textBundle.getString("command.listUsers.footer"));
+        }        
         
     }
 
