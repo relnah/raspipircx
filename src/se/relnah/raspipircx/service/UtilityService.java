@@ -29,7 +29,8 @@ public final class UtilityService {
     protected UtilityService() {}
 
     /**
-     * Gets user matching nick in userList.
+     * Gets user matching nick in userList. Removes trailing _ and everything after and including |
+     * to better handle temp nicks.
      * @param nick
      * @param userList
      * @return BotUser or null if user wasn't found.
@@ -37,6 +38,16 @@ public final class UtilityService {
     public static BotUser getUser(String nick, List<BotUser> userList) {
 
         BotUser usr = null;
+        
+
+        //Clear tempnick
+        if (nick.endsWith("_")) {
+            nick = nick.substring(0, nick.lastIndexOf('_'));
+        }
+
+        if (nick.contains("|")) {
+            nick = nick.substring(0, nick.indexOf('|'));
+        }
         
         for (BotUser user : userList) {
             if(nick.equalsIgnoreCase(user.getNick())) {
