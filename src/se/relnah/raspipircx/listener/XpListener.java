@@ -135,7 +135,10 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             
         }
         
-        addXpToUser(currentUser, joinXp, event);
+        //Don't add 0 XP
+        if (joinXp > 0) {
+            addXpToUser(currentUser, joinXp, event);
+        }
         return currentUser;
         
     }
