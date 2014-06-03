@@ -191,6 +191,14 @@ public class BotUser implements Serializable {
     }
 
     /**
+     * Adds a standard title to user
+     * @param usrTitle
+     */
+    public void addTitle(UserTitle usrTitle) {
+        this.titles.add(usrTitle);
+    }
+
+    /**
      * Adds a custom title to user
      * @param title
      * @param levelReq

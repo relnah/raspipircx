@@ -65,6 +65,19 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                 
                 //Remove trailing space added from last iteration of loop.
                 usr.addCustomTitle(title.trim(), levelReq);
+            } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.admin.addTitle").toLowerCase())) {
+                
+                String[] param = event.getMessage().split(" ");
+                int levelReq = Integer.parseInt(param[1]);
+
+                //Params from index 2 and onwards are all part of the title.
+                String title = "";
+                for (int i = 2; i < param.length; i++) {
+                    title += param[i] + " ";
+                }
+                
+                //Remove trailing space added from last iteration of loop.
+                addTitleToList(title.trim(), levelReq);
             }
             
         }
@@ -188,6 +201,17 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
         
     }
     
+    private void addTitleToList(String title, int levelReq) {
+        
+        List<UserTitle> titleList =  SerializeService.loadGsonTitleList();
+        
+        titleList.add(new UserTitle(title, levelReq));
+        
+        SerializeService.saveGsonTitleList(titleList);
+        
+    }
+
+
     @Override
     public void onMessage(MessageEvent<PircBotX> event) throws Exception {
 
@@ -203,8 +227,6 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
         }
         
         if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.listUsers").toLowerCase())) { //List users stats in channel ------------------------------
-            
-            String[] param = event.getMessage().split(" ");
             
             event.getChannel().send().message(textBundle.getString("command.listUsers.heading"));
             

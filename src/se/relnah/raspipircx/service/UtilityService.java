@@ -39,15 +39,7 @@ public final class UtilityService {
 
         BotUser usr = null;
         
-
-        //Clear tempnick
-        if (nick.endsWith("_")) {
-            nick = nick.substring(0, nick.lastIndexOf('_'));
-        }
-
-        if (nick.contains("|")) {
-            nick = nick.substring(0, nick.indexOf('|'));
-        }
+        nick = cleanNick(nick);
         
         for (BotUser user : userList) {
             if(nick.equalsIgnoreCase(user.getNick())) {
@@ -58,6 +50,23 @@ public final class UtilityService {
         
         return usr;
         
+    }
+
+    /**
+     * Attempts to clean alternative nick markers such as nick|2 and nick_
+     * @param nick
+     * @return
+     */
+    public static String cleanNick(String nick) {
+        //Clear tempnick
+        if (nick.endsWith("_")) {
+            nick = nick.substring(0, nick.lastIndexOf('_'));
+        }
+
+        if (nick.contains("|")) {
+            nick = nick.substring(0, nick.indexOf('|'));
+        }
+        return nick;
     }
 
     /**
