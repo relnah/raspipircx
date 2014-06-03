@@ -5,6 +5,8 @@ package se.relnah.raspipircx.pojo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author davbj
@@ -28,6 +30,7 @@ public class BotUser implements Serializable {
     private int numTypedLines;
     private int numKudosGiven;
     private int numKudosRecieved;
+    private Map<String, String> settings;
     
     
     
@@ -45,6 +48,7 @@ public class BotUser implements Serializable {
         this.numTypedLines = 0;
         this.numKudosGiven = 0;
         this.numKudosRecieved = 0;
+        this.settings = new HashMap<String, String>();
     }
 
     /**
@@ -84,6 +88,24 @@ public class BotUser implements Serializable {
     public int increasKudosRecieved() {
         this.numKudosRecieved++;
         return numKudosRecieved;
+    }
+    
+    /**
+     * Sets a setting on the user
+     * @param key
+     * @param value
+     */
+    public void setSetting(String key, String value) {
+        settings.put(key, value);
+    }
+    
+    /**
+     * Gets value of a setting
+     * @param key
+     * @return
+     */
+    public String getSetting(String key) {
+        return settings.get(key);
     }
     
     /**

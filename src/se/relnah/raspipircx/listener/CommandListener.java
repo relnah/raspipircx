@@ -196,6 +196,18 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                 event.respond(textBundle.getString("command.selectTitle.wrongIndex"));
             }
 
+        } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.notificationOn").toLowerCase())) { //Slå på notifiering
+
+            BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);
+            usr.setSetting("notification", "true");
+            event.respond(textBundle.getString("command.notificationOn.response"));
+            
+        } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.notificationOff").toLowerCase())) { //Slå av notifiering
+
+            BotUser usr = UtilityService.getUser(event.getUser().getNick(), userList);
+            usr.setSetting("notification", "false");
+            event.respond(textBundle.getString("command.notificationOff.response"));
+            
         }
         
         

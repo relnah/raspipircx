@@ -17,6 +17,7 @@ import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 
+import se.relnah.raspipircx.listener.BotServiceListener;
 import se.relnah.raspipircx.listener.CommandListener;
 import se.relnah.raspipircx.listener.XpListener;
 import se.relnah.raspipircx.pojo.BotUser;
@@ -72,6 +73,7 @@ public class RaspiPircx {
         	        .setCapEnabled(true) //Enable CAP features
         	        .addListener(new XpListener(userList, textBundle)) //This class is a listener, so add it to the bots known listeners
         	        .addListener(new CommandListener(userList, textBundle))
+        	        .addListener(new BotServiceListener(userList, textBundle))
         	        .setServerHostname(conf.getProperty("server"))
         	        .setServerPort(Integer.parseInt(conf.getProperty("port")))
         	        .setSocketFactory(SSLSocketFactory.getDefault())
