@@ -64,7 +64,11 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                 }
                 
                 //Remove trailing space added from last iteration of loop.
-                usr.addCustomTitle(title.trim(), levelReq);
+                title = title.trim();
+                usr.addCustomTitle(title, levelReq);
+                
+                UtilityService.getBotChan(event).send().message(UtilityService.getText(textBundle, "command.admin.awardTitle.notifyChannel", new String[] {usr.getNick(), usr.getSelectedTitle().getQuoutedTitle(), title}));
+                
             } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.admin.addTitle").toLowerCase())) {
                 
                 String[] param = event.getMessage().split(" ");
@@ -184,6 +188,7 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                         usr.setChoosenTitleIndex(selectedIndex);
                         event.respond(UtilityService.getText(textBundle, "command.selectTitle.confirm", new String[] {usr.getTitles().get(selectedIndex).getTitle()}));
                         event.respond(UtilityService.getText(textBundle, "command.selectTitle.exampleGreeting", new String[] {usr.getNick(), usr.getSelectedTitle().getTitle()}));
+                        UtilityService.getBotChan(event).send().message(UtilityService.getText(textBundle, "command.selectTitle.notifyChannel", new String[] {usr.getNick(), usr.getSelectedTitle().getTitle()}));
                     } else {
                         event.respond(UtilityService.getText(textBundle, "command.selectTitle.notQualified", new String[] {Integer.toString(levelReq)}));
                     }

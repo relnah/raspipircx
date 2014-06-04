@@ -1,6 +1,5 @@
 package se.relnah.raspipircx.listener;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -21,7 +20,9 @@ import org.pircbotx.hooks.events.UserListEvent;
 import se.relnah.raspipircx.pojo.BotUser;
 import se.relnah.raspipircx.pojo.UserTitle;
 import se.relnah.raspipircx.service.SerializeService;
+import se.relnah.raspipircx.service.TitleService;
 import se.relnah.raspipircx.service.UtilityService;
+import se.relnah.raspipircx.service.XpService;
 
 import com.google.common.collect.ImmutableSortedSet;
 
@@ -49,7 +50,8 @@ public class XpListener extends ListenerAdapter<PircBotX> {
         //Greet joining users.
         String greeting = getGreeting(currentUser, event.getTimestamp());
         
-        event.respond(greeting);
+        Channel chan = UtilityService.getBotChan(event);
+        chan.send().message(greeting);
         
     }
     
@@ -151,6 +153,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             return;
         }
         
+        //Increas numer of lines typed
         UtilityService.getUser(event.getUser().getNick(), userList).increasLinesTyped();
         
         
@@ -235,7 +238,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             greeting = textBundle.getString("general.onJoin.greeting.default");
         }
         
-        greeting += " " + currentUser.getSelectedTitle().getTitle();
+        greeting += " " + currentUser.getNick() + " " + currentUser.getSelectedTitle().getQuoutedTitle() + "!";
         
         return greeting;
     
@@ -250,90 +253,28 @@ public class XpListener extends ListenerAdapter<PircBotX> {
      */
     private void addXpToUser(BotUser usr, int xp, Event<PircBotX> event) {
         int newXp = usr.addXp(xp);
-        //eventUser.send().message(UtilityService.getText(textBundle, "info.welcome", new String[] {textBundle.getString("command.kudos")}));
 
-        int calculatedLevel = calculateLevel(newXp, usr.getLevel());
+        int calculatedLevel = XpService.calculateLevel(newXp, usr.getLevel());
         
         if (calculatedLevel > usr.getLevel()) {
             usr.setLevel(calculatedLevel);
-            event.respond(UtilityService.getText(textBundle, "general.levelUp", new String[] {usr.getNick(), usr.getSelectedTitle().getTitle(), Integer.toString(usr.getLevel())}));
+            UtilityService.getBotChan(event).send().message(UtilityService.getText(textBundle, "general.levelUp", new String[] {usr.getNick(), usr.getSelectedTitle().getQuoutedTitle(), Integer.toString(usr.getLevel())}));
         }
         
         //Check if user should be awarded titles and award them
+        List<UserTitle> awardedTitles = TitleService.awardTitles(usr);
         
-        List<UserTitle> awardedTitles = awardTitles(usr);
-        
+
+        //Notify channel of awarded titles
         if (awardedTitles.size() > 0) {
-            Channel chan = event.getBot().getUserBot().getChannels().first();
-            chan.send().message(UtilityService.getText(textBundle, "general.awardedTitleHeading", new String[] {usr.getNick(), usr.getSelectedTitle().getTitle()}));
+            Channel chan = UtilityService.getBotChan(event);
+            chan.send().message(UtilityService.getText(textBundle, "general.awardedTitleHeading", new String[] {usr.getNick(), usr.getSelectedTitle().getQuoutedTitle()}));
             for (UserTitle userTitle : awardedTitles) {
                 chan.send().message(userTitle.getTitle());
             }
-            chan.send().message(UtilityService.getText(textBundle, "general.awardedTitleFooter", new String[] {usr.getNick(), usr.getSelectedTitle().getTitle()}));
+            chan.send().message(UtilityService.getText(textBundle, "general.awardedTitleFooter", new String[] {usr.getNick(), usr.getSelectedTitle().getQuoutedTitle()}));
         }
         
-    }
-
-    /**
-     * Check if user should be awarded titles and awards the one that the user doesn't already have
-     * @param usr
-     * @return
-     */
-    private List<UserTitle> awardTitles(BotUser usr) {
-        // TODO Auto-generated method stub
-        // read json with serializeservice
-        List<UserTitle> awardToUser = new ArrayList<UserTitle>();
-        List<UserTitle> awardedToUser = new ArrayList<UserTitle>();
-        
-        //Check level titles
-        List<UserTitle> levelTitles = SerializeService.loadGsonTitleList();
-        
-        for (UserTitle userTitle : levelTitles) {
-            if (userTitle.getLevelReq() <= usr.getLevel()) {
-                awardToUser.add(userTitle);
-            }
-        }
-        
-        //TODO Loop and check other types of level lists. Eg. Kudos level list.
-        
-        //Add titles to user
-        for (UserTitle newTitle : awardToUser) {
-            Boolean titleExists = false;
-            
-            //Check if user already has title
-            for (UserTitle existingTitle : usr.getTitles()) {
-                if (newTitle.getTitle().equalsIgnoreCase(existingTitle.getTitle())) {
-                    titleExists = true;
-                }
-            }
-            
-            //Add title to user if it's new
-            if (!titleExists) {
-                usr.addTitle(newTitle);
-                awardedToUser.add(newTitle);
-            }
-        }
-        
-        return awardedToUser;
-    }
-
-
-    /**
-     * Calculates level based on current XP and current level.
-     * @param newXp
-     * @param lvl
-     * @return int calculated level
-     */
-    private int calculateLevel(int newXp, int lvl) {
-
-        int nextLvlReq = (4 * lvl) * ((3 * lvl) + 45);
-        
-        while (newXp > nextLvlReq) {
-            lvl++;
-            nextLvlReq = (4 * lvl) * ((3 * lvl) + 45);
-        }
-        
-        return lvl;
     }
 
     @Override

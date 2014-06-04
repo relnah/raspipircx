@@ -16,7 +16,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.pircbotx.Channel;
+import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.pircbotx.hooks.Event;
 
 import se.relnah.raspipircx.pojo.BotUser;
 
@@ -168,6 +171,15 @@ public final class UtilityService {
            
         }
         return false;
+    }
+
+    /**
+     * Returns first channel in the list of channels the bot has joined
+     * @param event
+     * @return
+     */
+    public static Channel getBotChan(Event<PircBotX> event) {
+        return event.getBot().getUserBot().getChannels().first();
     }
 
     
