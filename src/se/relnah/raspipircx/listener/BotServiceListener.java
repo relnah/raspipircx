@@ -3,7 +3,6 @@
  */
 package se.relnah.raspipircx.listener;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -38,7 +37,7 @@ public class BotServiceListener extends ListenerAdapter<PircBotX> {
         for (User usr : event.getChannel().getUsers()) {
             if (msg.toLowerCase().contains(usr.getNick().toLowerCase())) {
                 BotUser botUser = UtilityService.getUser(usr.getNick(), userList);
-                if ("true".equalsIgnoreCase(botUser.getSetting("notify"))) {
+                if ("true".equalsIgnoreCase(botUser.getSetting("notification"))) {
                     usr.send().message(textBundle.getString("general.userNotification"));
                 }
             }

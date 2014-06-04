@@ -34,8 +34,8 @@ public class RaspiPircx {
         
         //Load list of users
         userList = SerializeService.loadGsonUserList();
-        
-        /* Code to convert userList to new object
+        /*
+        //Code to convert userList to new object
         List<BotUser> newUserList = new ArrayList<BotUser>();
         for (BotUser botUser : userList) {
             BotUser tmpBotUser = new BotUser(botUser.getNick());
@@ -44,6 +44,8 @@ public class RaspiPircx {
             tmpBotUser.setConsecutiveDays(botUser.getConsecutiveDays());
             tmpBotUser.setHostMask(botUser.getHostMask());
             tmpBotUser.setLastJoinedTimestamp(botUser.getLastJoinedTimestamp());
+            tmpBotUser.setTitles(botUser.getTitles());
+            tmpBotUser.setChoosenTitleIndex(botUser.getChoosenTitleIndex());
             
             for (int i = 0; i < botUser.getNumKudosGiven(); i++) {
                 tmpBotUser.increasKudosGiven();
@@ -61,7 +63,8 @@ public class RaspiPircx {
         }
         
        userList = newUserList;
-        */
+       ///End conversion///
+       */
         //Load texts
         ResourceBundle textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
         
