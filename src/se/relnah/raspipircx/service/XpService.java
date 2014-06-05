@@ -22,11 +22,15 @@ public final class XpService {
      */
     public static int calculateLevel(int newXp, int lvl) {
 
-        int nextLvlReq = (4 * lvl) * ((3 * lvl) + 45);
+        //Next level
+        int nextLvl = lvl + 1;
+        
+        int nextLvlReq = (4 * nextLvl) * ((3 * nextLvl) + 45);
         
         while (newXp > nextLvlReq) {
             lvl++;
-            nextLvlReq = (4 * lvl) * ((3 * lvl) + 45);
+            nextLvl++;
+            nextLvlReq = (4 * nextLvl) * ((3 * nextLvl) + 45);
         }
         
         return lvl;

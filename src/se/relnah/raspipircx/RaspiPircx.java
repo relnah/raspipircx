@@ -85,6 +85,16 @@ public class RaspiPircx {
         	        .buildConfiguration();
         	PircBotX bot = new PircBotX(configuration);
 
+        	/*
+        	//XP curve
+        	for (int lvl = 1; lvl <= 60; lvl++) {
+        	    int lvlXp = (4 * lvl) * ((3 * lvl) + 45);
+        	    System.out.println(lvl + " " + lvlXp);
+            }
+            System.exit(0);
+        	//
+        	 * 
+        	 */
 
             //Create timer to save userlist.
             Timer timer = new Timer(true);
