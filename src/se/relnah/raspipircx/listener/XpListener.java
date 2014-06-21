@@ -112,8 +112,9 @@ public class XpListener extends ListenerAdapter<PircBotX> {
             LocalDate nowDate = now.toLocalDate();
             LocalDate lastLoginDate = lastLogin.toLocalDate();
 
-            //Add xp for first join of the day
-            if (nowDate.compareTo(lastLoginDate) > 0) {
+            int dayOfWeek = nowDate.dayOfWeek().get();
+            //Add xp for first join of the day and if week-day
+            if (nowDate.compareTo(lastLoginDate) > 0 && dayOfWeek < 6) {
                 
                 int xp = 100;
                 
