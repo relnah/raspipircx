@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="PircBotx" default="compile">
+<project name="PircBotx" default="dist">
     <description>
             Build file for PircBotx project.
     </description>
 
 	<property name="src" location="src"/>
 	<property name="classesoutput" location="classes"/>
-	<property name="lib" location="lib"/>
+    <property name="lib" location="lib"/>
+    <property name="dist" location="dist"/>
 	
 	
 	
@@ -31,5 +32,12 @@
     		</classpath>
     	</javac>
     </target>
+	
+	<target name="dist" description="Distribute app" depends="compile">
+		  <jar destfile="${dist}/XpBot.jar">
+		    <fileset dir="${classesoutput}"/>
+		    <fileset dir="${src}/resources"/>
+		  </jar>		
+	</target>
 
 </project>
