@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="PircBotx" default="dist">
+<project name="XpBot" default="dist">
     <description>
-            Build file for PircBotx project.
+            Build file for XpBot project.
     </description>
 
 	<property name="src" location="src"/>
@@ -34,10 +34,19 @@
     </target>
 	
 	<target name="dist" description="Distribute app" depends="compile">
-		  <jar destfile="${dist}/XpBot.jar">
+
+		<copy todir="${dist}/lib">
+			<fileset dir="${lib}"/>
+		</copy>
+		
+		<jar destfile="${dist}/XpBot.jar">
+			<manifest>
+				<attribute name="Main-Class" value="se.relnah.raspipircx.RaspiPircx"/>
+				<attribute name="Class-Path" value=". lib/commons-codec-1.9.jar lib/commons-lang3-3.2.1.jar lib/guava-16.0.1.jar lib/pircbotx-2.0.1.jar lib/slf4j-api-1.7.6.jar lib/joda-time-2.3.jar lib/gson-2.2.4.jar lib/logback-classic-1.1.2.jar lib/logback-core-1.1.2.jar"/>
+			</manifest>
 		    <fileset dir="${classesoutput}"/>
 		    <fileset dir="${src}/resources"/>
-		  </jar>		
+		</jar>		
 	</target>
 
 </project>

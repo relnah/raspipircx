@@ -1,2 +1,2 @@
 #!/bin/bash
-java -cp classes/:lib/* se.relnah.raspipircx.RaspiPircx
+java -jar dist/XpBot.jar
