@@ -178,7 +178,10 @@ public class XpListener extends ListenerAdapter<PircBotX> {
                 Random r = new Random();
                 xp += r.nextInt(11);
                 
-                event.respond(UtilityService.getText(textBundle, "command.kudos.userRewarded", new String[] {usr.getNick(), Integer.toString(xp), event.getUser().getNick()}));
+                Channel chan = UtilityService.getBotChan(event);
+                chan.send().message(UtilityService.getText(textBundle, "command.kudos.userRewarded", new String[] {usr.getNick(), Integer.toString(xp), event.getUser().getNick()}));
+                
+                //event.respond(UtilityService.getText(textBundle, "command.kudos.userRewarded", new String[] {usr.getNick(), Integer.toString(xp), event.getUser().getNick()}));
                 
                 //Increas kudos recieved and given for the users involved.
                 usr.increasKudosRecieved();
