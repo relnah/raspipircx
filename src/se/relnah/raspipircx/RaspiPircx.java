@@ -15,7 +15,9 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.exception.IrcException;
+import org.pircbotx.hooks.Event;
 
 import se.relnah.raspipircx.listener.BotServiceListener;
 import se.relnah.raspipircx.listener.CommandListener;
@@ -23,10 +25,16 @@ import se.relnah.raspipircx.listener.XpListener;
 import se.relnah.raspipircx.pojo.BotUser;
 import se.relnah.raspipircx.service.SerializeService;
 import se.relnah.raspipircx.service.UtilityService;
+import se.relnah.raspipircx.service.XpService;
+
+import com.google.common.collect.ImmutableSortedSet;
 
 public class RaspiPircx {
 
     private static List<BotUser> userList = new ArrayList<BotUser>();
+    private static ResourceBundle textBundle;
+    private static PircBotX bot;
+    
     public static void main(String[] args) {
 
         //Get config
@@ -66,7 +74,7 @@ public class RaspiPircx {
        ///End conversion///
        */
         //Load texts
-        ResourceBundle textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
+        textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
         
         	//Setup this bot
         	Configuration<PircBotX> configuration = new Configuration.Builder<PircBotX>()
@@ -83,7 +91,7 @@ public class RaspiPircx {
         	        .addAutoJoinChannel(conf.getProperty("channel"))
         	        .setEncoding(Charset.forName("ISO-8859-1"))
         	        .buildConfiguration();
-        	PircBotX bot = new PircBotX(configuration);
+        	bot = new PircBotX(configuration);
 
         	/*
         	//XP curve
@@ -96,9 +104,10 @@ public class RaspiPircx {
         	 * 
         	 */
 
-            //Create timer to save userlist.
+            //Create timer.
             Timer timer = new Timer(true);
             
+            //Create task to save user list
             TimerTask saveUserListTask = new TimerTask() {
                 
                 @Override
@@ -107,8 +116,19 @@ public class RaspiPircx {
                 }
             };
             
-            //Schedule task
+            //Create task to check users
+            TimerTask checkUsersTask = new TimerTask() {
+				
+				@Override
+				public void run() {
+					checkUsers(bot, textBundle);
+					
+				}
+			};
+            
+            //Schedule tasks
             timer.schedule(saveUserListTask, 30 * 1000, 5 * 60 * 1000);
+            // TODO schedule at tomorrow 0700 execute every 24h timer.schedule(checkUsersTask, );
         	
         	//Connect to server
         	try {
@@ -123,6 +143,35 @@ public class RaspiPircx {
         	
         }
     
+    private static void checkUsers(PircBotX bot, ResourceBundle textBundle) {
+		
+        ImmutableSortedSet<User> users = bot.getUserBot().getChannels().first().getUsers();
+        
+        for (User user : users) {
+            
+            //Don't listen to the bot itself
+            if (user.getNick().equals(bot.getNick())) {
+                continue;
+            }
+            
+            
+            //Fake event
+            Event<PircBotX> event = new Event<PircBotX>(bot) {
+				
+				@Override
+				public void respond(String arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+			};
+			
+			
+            
+            BotUser currentUser = UtilityService.getUser(user.getNick(), userList);
+            XpService.doUserCheck(user, currentUser, event, textBundle, userList);
+        }
+    	
+    }
     
     
     /**
