@@ -13,6 +13,7 @@ import java.util.TimerTask;
 
 import javax.net.ssl.SSLSocketFactory;
 
+import org.joda.time.DateTime;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -127,8 +128,10 @@ public class RaspiPircx {
 			};
             
             //Schedule tasks
-            timer.schedule(saveUserListTask, 30 * 1000, 5 * 60 * 1000);
-            // TODO schedule at tomorrow 0700 execute every 24h timer.schedule(checkUsersTask, );
+            timer.schedule(saveUserListTask, 30 * 1000, 5 * 60 * 1000); //Wait 30 seconds and save every 5 min.
+            
+            DateTime tomorrow = new DateTime().plusDays(1).withTime(8, 0, 0, 0);
+            timer.schedule(checkUsersTask, tomorrow.toDate(), 24 * 60 * 60 * 1000); //Start tomorrow at 8 and run every 24h.
         	
         	//Connect to server
         	try {
