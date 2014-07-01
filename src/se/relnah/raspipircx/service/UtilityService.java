@@ -4,6 +4,8 @@
 package se.relnah.raspipircx.service;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -20,6 +22,8 @@ import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.relnah.raspipircx.pojo.BotUser;
 
@@ -30,6 +34,7 @@ import se.relnah.raspipircx.pojo.BotUser;
 public final class UtilityService {
 
     protected UtilityService() {}
+    private static Logger LOG = LoggerFactory.getLogger(UtilityService.class);
 
     /**
      * Gets user matching nick in userList. Removes trailing _ and everything after and including |
@@ -85,8 +90,7 @@ public final class UtilityService {
         URL[] urls = {file.toURI().toURL()};
         loader = new URLClassLoader(urls);
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(UtilityService.stackTraceToString(e));
         }
         
         ResourceBundle textBundle = ResourceBundle.getBundle(baseName, locale, loader);
@@ -183,6 +187,26 @@ public final class UtilityService {
     }
 
     
+    /**
+     * Get stacktrace as a string
+     * @param e
+     */
+    public static String stackTraceToString(Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw); 
+        return sw.toString();        
+    }
     
+    /**
+     * Removes invalid characters from nick
+     * @param rawNick
+     * @return clean nick
+     */
+    public static String removeInvalidCharacters(String rawNick) {
+        return rawNick.replaceAll("[.:,;]","");
+    }
+    
+
 
 }

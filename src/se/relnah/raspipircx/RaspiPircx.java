@@ -19,6 +19,8 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.relnah.raspipircx.listener.BotServiceListener;
 import se.relnah.raspipircx.listener.CommandListener;
@@ -35,6 +37,7 @@ public class RaspiPircx {
     private static List<BotUser> userList = new ArrayList<BotUser>();
     private static ResourceBundle textBundle;
     private static PircBotX bot;
+    private static Logger LOG = LoggerFactory.getLogger(RaspiPircx.class);
     
     public static void main(String[] args) {
 
@@ -138,11 +141,11 @@ public class RaspiPircx {
         	    bot.startBot();
         	} catch (IOException e) {
                 SerializeService.saveGsonUserList(userList);
-                e.printStackTrace();
+                LOG.error(UtilityService.stackTraceToString(e));
             } catch (IrcException e) {
                 SerializeService.saveGsonUserList(userList);
-                e.printStackTrace();
-            }       	
+                LOG.error(UtilityService.stackTraceToString(e));
+            }
         	
         }
     
@@ -163,7 +166,6 @@ public class RaspiPircx {
 				
 				@Override
 				public void respond(String arg0) {
-					// TODO Auto-generated method stub
 					
 				}
 			};
@@ -190,12 +192,10 @@ public class RaspiPircx {
             prop.load(in);
             in.close();
         } catch (FileNotFoundException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            LOG.error(UtilityService.stackTraceToString(e1));
             System.exit(1);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(UtilityService.stackTraceToString(e));
             System.exit(1);
         } finally {
             
@@ -203,8 +203,7 @@ public class RaspiPircx {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LOG.error(UtilityService.stackTraceToString(e));
                 }
             }
         }

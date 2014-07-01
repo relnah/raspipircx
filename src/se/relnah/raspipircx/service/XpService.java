@@ -12,6 +12,8 @@ import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.relnah.raspipircx.pojo.BotUser;
 import se.relnah.raspipircx.pojo.UserTitle;
@@ -26,6 +28,7 @@ public final class XpService {
      * 
      */
     protected XpService() {}
+    private static Logger LOG = LoggerFactory.getLogger(XpService.class);
     
     /**
      * Calculates level based on current XP and current level.
@@ -131,7 +134,8 @@ public final class XpService {
      */
     public static void addXpToUser(BotUser usr, int xp, Event<PircBotX> event, ResourceBundle textBundle) {
         int newXp = usr.addXp(xp);
-
+        LOG.info("Added " + xp + " XP to user: " + usr.getNick());
+        
         int calculatedLevel = XpService.calculateLevel(newXp, usr.getLevel());
         
         if (calculatedLevel > usr.getLevel()) {

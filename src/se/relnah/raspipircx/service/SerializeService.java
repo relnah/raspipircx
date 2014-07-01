@@ -12,6 +12,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.relnah.raspipircx.pojo.BotUser;
 import se.relnah.raspipircx.pojo.UserTitle;
 
@@ -26,7 +29,7 @@ import com.google.gson.reflect.TypeToken;
 public final class SerializeService {
 
     protected SerializeService(){};
-    
+    private static Logger LOG = LoggerFactory.getLogger(SerializeService.class);
     
     /**
      * Saves userlist in json format to file
@@ -38,14 +41,14 @@ public final class SerializeService {
         List<String> lines = new ArrayList<String>();
         lines.add(json);
         
-        System.out.println("Saving user list...");
+        LOG.info("Saving user list...");
         
         Path path = Paths.get("./users.json");
 
         try {
             Files.write(path, lines, StandardCharsets.UTF_8);            
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(UtilityService.stackTraceToString(e));
         }
     }
     
@@ -61,8 +64,7 @@ public final class SerializeService {
         try {
             lines = Files.readAllLines(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(UtilityService.stackTraceToString(e));
         }
         
         String json = "";
@@ -90,14 +92,15 @@ public final class SerializeService {
         List<String> lines = new ArrayList<String>();
         lines.add(json);
         
-        System.out.println("Saving title list...");
+        LOG.info("Saving title list...");
+
         
         Path path = Paths.get("./titles.json");
 
         try {
             Files.write(path, lines, StandardCharsets.UTF_8);            
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(UtilityService.stackTraceToString(e));
         }
     }
     
@@ -113,8 +116,7 @@ public final class SerializeService {
         try {
             lines = Files.readAllLines(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(UtilityService.stackTraceToString(e));
         }
         
         String json = "";

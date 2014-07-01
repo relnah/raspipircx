@@ -18,9 +18,7 @@ public final class TitleService {
     /**
      * 
      */
-    protected TitleService() {
-        // TODO Auto-generated constructor stub
-    }
+    protected TitleService(){}
     
     /**
      * Check if user should be awarded titles and awards the one that the user doesn't already have
@@ -28,7 +26,7 @@ public final class TitleService {
      * @return
      */
     public static List<UserTitle> awardTitles(BotUser usr) {
-        // TODO Auto-generated method stub
+
         // read json with serializeservice
         List<UserTitle> awardToUser = new ArrayList<UserTitle>();
         List<UserTitle> awardedToUser = new ArrayList<UserTitle>();

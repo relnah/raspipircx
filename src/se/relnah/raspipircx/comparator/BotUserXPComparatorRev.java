@@ -16,9 +16,7 @@ public class BotUserXPComparatorRev implements Comparator<BotUser> {
     /**
      * 
      */
-    public BotUserXPComparatorRev() {
-        // TODO Auto-generated constructor stub
-    }
+    public BotUserXPComparatorRev(){}
 
     @Override
     public int compare(BotUser user1, BotUser user2) {

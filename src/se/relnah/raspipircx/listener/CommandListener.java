@@ -13,6 +13,8 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.relnah.raspipircx.comparator.BotUserXPComparatorRev;
 import se.relnah.raspipircx.pojo.BotUser;
@@ -28,6 +30,7 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
     
     private List<BotUser> userList;
     private ResourceBundle textBundle;
+    private Logger LOG = LoggerFactory.getLogger(CommandListener.class);
     
     public CommandListener(List<BotUser> userList, ResourceBundle textBundle) {
         this.userList = userList;
@@ -197,7 +200,7 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
                     event.respond(textBundle.getString("command.selectTitle.wrongIndex"));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.error(UtilityService.stackTraceToString(e));
                 event.respond(textBundle.getString("command.selectTitle.wrongIndex"));
             }
 
