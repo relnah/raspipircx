@@ -38,14 +38,19 @@ public class RaspiPircx {
     private static ResourceBundle textBundle;
     private static PircBotX bot;
     private static Logger LOG = LoggerFactory.getLogger(RaspiPircx.class);
+    private static String rootPath = "./";
     
     public static void main(String[] args) {
 
+        if (args.length > 0) {
+            rootPath = args[0];
+        }
+        
         //Get config
-        Properties conf = readConfig("./conf/conf.properties");
+        Properties conf = readConfig(rootPath + "/conf/conf.properties");
         
         //Load list of users
-        userList = SerializeService.loadGsonUserList();
+        userList = SerializeService.loadGsonUserList(rootPath);
         /*
         //Code to convert userList to new object
         List<BotUser> newUserList = new ArrayList<BotUser>();
@@ -78,7 +83,7 @@ public class RaspiPircx {
        ///End conversion///
        */
         //Load texts
-        textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
+        textBundle = UtilityService.getTextBundle(rootPath, "texts", new Locale("sv", "SE"));
         
         	//Setup this bot
         	Configuration<PircBotX> configuration = new Configuration.Builder<PircBotX>()
@@ -86,8 +91,8 @@ public class RaspiPircx {
         	        .setLogin(conf.getProperty("login")) //login part of hostmask, eg name:login@host
         	        .setAutoNickChange(true) //Automatically change nick when the current one is in use
         	        .setCapEnabled(true) //Enable CAP features
-        	        .addListener(new XpListener(userList, textBundle)) //This class is a listener, so add it to the bots known listeners
-        	        .addListener(new CommandListener(userList, textBundle))
+        	        .addListener(new XpListener(rootPath, userList, textBundle)) //This class is a listener, so add it to the bots known listeners
+        	        .addListener(new CommandListener(rootPath, userList, textBundle))
         	        .addListener(new BotServiceListener(userList, textBundle))
         	        .setServerHostname(conf.getProperty("server"))
         	        .setServerPort(Integer.parseInt(conf.getProperty("port")))
@@ -116,7 +121,7 @@ public class RaspiPircx {
                 
                 @Override
                 public void run() {
-                    SerializeService.saveGsonUserList(userList);
+                    SerializeService.saveGsonUserList(rootPath, userList);
                 }
             };
             
@@ -140,10 +145,10 @@ public class RaspiPircx {
         	try {
         	    bot.startBot();
         	} catch (IOException e) {
-                SerializeService.saveGsonUserList(userList);
+                SerializeService.saveGsonUserList(rootPath, userList);
                 LOG.error(UtilityService.stackTraceToString(e));
             } catch (IrcException e) {
-                SerializeService.saveGsonUserList(userList);
+                SerializeService.saveGsonUserList(rootPath, userList);
                 LOG.error(UtilityService.stackTraceToString(e));
             }
         	

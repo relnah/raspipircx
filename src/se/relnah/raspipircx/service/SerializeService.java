@@ -33,9 +33,10 @@ public final class SerializeService {
     
     /**
      * Saves userlist in json format to file
+     * @param rootPath 
      * @param userList
      */
-    public static void saveGsonUserList(List<BotUser> userList) {
+    public static void saveGsonUserList(String rootPath, List<BotUser> userList) {
         Gson gson = new Gson();
         String json = gson.toJson(userList);
         List<String> lines = new ArrayList<String>();
@@ -43,7 +44,7 @@ public final class SerializeService {
         
         LOG.info("Saving user list...");
         
-        Path path = Paths.get("./users.json");
+        Path path = Paths.get(rootPath + "/users.json");
 
         try {
             Files.write(path, lines, StandardCharsets.UTF_8);            
@@ -54,13 +55,14 @@ public final class SerializeService {
     
     /**
      * Loads user list from file in json format
+     * @param rootPath 
      * @return
      */
-    public static List<BotUser> loadGsonUserList() {
+    public static List<BotUser> loadGsonUserList(String rootPath) {
         Gson gson = new Gson();
         List<String> lines = new ArrayList<String>();
 
-        Path path = Paths.get("./users.json");
+        Path path = Paths.get(rootPath + "/users.json");
         try {
             lines = Files.readAllLines(path, StandardCharsets.UTF_8);
         } catch (IOException e) {

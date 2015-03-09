@@ -80,13 +80,14 @@ public final class UtilityService {
     /**
      * Gets resource bundle with application texts.
      * @param baseName
+     * @param string 
      * @param locale
      * @return ResourceBundle
      */
-    public static ResourceBundle getTextBundle(String baseName, Locale locale) {
+    public static ResourceBundle getTextBundle(String rootPath, String baseName, Locale locale) {
         ClassLoader loader = null;
         try {
-        File file = new File("./texts");
+        File file = new File(rootPath + "/texts");
         URL[] urls = {file.toURI().toURL()};
         loader = new URLClassLoader(urls);
         } catch (MalformedURLException e) {

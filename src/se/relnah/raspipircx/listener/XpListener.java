@@ -26,8 +26,10 @@ public class XpListener extends ListenerAdapter<PircBotX> {
     
     private List<BotUser> userList;
     private ResourceBundle textBundle;
+    private String rootPath;
     
-    public XpListener(List<BotUser> userList, ResourceBundle textBundle) {
+    public XpListener(String rootPath, List<BotUser> userList, ResourceBundle textBundle) {
+        this.rootPath = rootPath;
         this.userList = userList;
         this.textBundle = textBundle;
     }
@@ -164,7 +166,7 @@ public class XpListener extends ListenerAdapter<PircBotX> {
 
     @Override
     public void onDisconnect(DisconnectEvent<PircBotX> event) throws Exception {
-        SerializeService.saveGsonUserList(userList);
+        SerializeService.saveGsonUserList(rootPath, userList);
     }
     
 }

@@ -31,10 +31,13 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
     private List<BotUser> userList;
     private ResourceBundle textBundle;
     private Logger LOG = LoggerFactory.getLogger(CommandListener.class);
+    private String rootPath;
     
-    public CommandListener(List<BotUser> userList, ResourceBundle textBundle) {
+    public CommandListener(String rootPath, List<BotUser> userList, ResourceBundle textBundle) {
+        this.rootPath = rootPath;
         this.userList = userList;
         this.textBundle = textBundle;
+        
     }
     
 
@@ -51,10 +54,10 @@ public class CommandListener extends ListenerAdapter<PircBotX> {
             //Save userlist to file
             if(event.getMessage().equals(textBundle.getString("command.admin.save"))) {
                 event.respond(textBundle.getString("command.admin.save.beginSave"));
-                SerializeService.saveGsonUserList(userList);
+                SerializeService.saveGsonUserList(rootPath, userList);
                 event.respond(textBundle.getString("command.admin.save.saved"));
             } else if (event.getMessage().equalsIgnoreCase(textBundle.getString("command.admin.reloadTexts"))) { //Reloads application texts
-                textBundle = UtilityService.getTextBundle("texts", new Locale("sv", "SE"));
+                textBundle = UtilityService.getTextBundle(rootPath, "texts", new Locale("sv", "SE"));
             } else if (event.getMessage().toLowerCase().startsWith(textBundle.getString("command.admin.awardTitle").toLowerCase())) {
                 String[] param = event.getMessage().split(" ");
                 BotUser usr = UtilityService.getUser(param[1], userList);
