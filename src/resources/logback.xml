@@ -6,10 +6,10 @@
       </layout>
   </appender>
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>./logs/xpbot.log</file>
+    <file>/home/relnah/xp-bot/logs/xpbot.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
-      <fileNamePattern>./logs/xpbot.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>/home/relnah/xp-bot/logs/xpbot.%d{yyyy-MM-dd}.log</fileNamePattern>
 
       <!-- keep 30 days' worth of history -->
       <maxHistory>30</maxHistory>
